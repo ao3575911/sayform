@@ -1,0 +1,163 @@
+# 14 · Error registry and message templates
+Spec `0.1-lite` · edition 0. RFC 2119 keywords as in [01-principles.md](01-principles.md).
+
+## 1. Format (normative)
+Every diagnostic has **5 parts**: (1) location, (2) *what* (plain English), (3) *why*, (4) one *try this*, (5) a stable code. Text form:
+```
+error[SAY-E0101]: tab used for indentation
+  --> shop/cart.say:12:1
+   |
+12 | →let total be 0
+   | ^
+ what: Line 12 is indented with a tab.
+  why: Sayform measures indentation in spaces so every editor shows the same structure.
+  try: Replace the tab with 4 spaces (`say fmt` does this for you).
+```
+1. Severity word is `error`, `warning` or `panic`. Panics add a trace (one line per frame: core node path + source span) before *what*.
+2. JSON form (`--json`, `say-json/1`): `{"code","severity","file","line","column","end_line","end_column","what","why","try","readings"?:[…],"trace"?:[…]}`.
+3. `{placeholders}` below are filled from the program. *what*, *why* and *try* MUST each be one sentence; *try* MUST be a concrete edit or command.
+4. Codes are `SAY-E`/`SAY-W` + 2-digit group + 2-digit item. A code is never reused; an item number is used by at most one of E/W. Group `00` is retired (the seed's `SAY-E0042` was illustrative only).
+5. Every code has a conformance test `ERR-<code>` ([15-conformance.md](15-conformance.md) §13): a minimal `.say` program and the expected code (and, for panics, exit code 70).
+
+## 2. Registry (96 active codes, 1 retired; E1012 is reported as W1012 outside `strict`)
+Kinds: **E** compile error (exit 2) · **W** warning · **P** panic (runtime, exit 70) · **H** host refusal (exit 4).
+
+### Group 01 · lexical and grammar
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0101 | E | tab in indentation | Line {line} is indented with a tab. | Indentation is measured in spaces so every editor shows the same structure. | Replace the tab with 4 spaces (`say fmt`). |
+| E0102 | E | indentation not a multiple of 4 | Line {line} is indented by {n} spaces. | One block level is exactly 4 spaces. | Indent by {suggested} spaces. |
+| E0103 | E | keyword in wrong case | `{word}` looks like the keyword `{kw}`. | Keywords are lowercase and case-sensitive. | Write `{kw}`. |
+| E0104 | E | article outside a slot | `{article}` cannot appear here. | `a`, `an` and `the` only appear in type phrases and possession. | Remove `{article}`, or use it in a type phrase like `(a number)`. |
+| E0105 | E | invalid character or word | `{text}` is not valid Sayform source. | {reason: invalid UTF-8 / lone CR / not NFC / joiner not followed by a letter / stray apostrophe / `**`}. | {fix: e.g. write `level2`, use `^` for powers}. |
+| E0106 | E | unterminated text | This text starting at {line}:{col} never ends. | Single-line text must close on the same line. | Add `"` or use `"""` for multi-line text. |
+| E0107 | E | type phrase where a value is expected | `{phrase}` names a type, but a value is expected here. | Type phrases are only read in type slots. | Write `let {name}: {phrase} be {value}`. |
+| E0108 | E | ambiguous reading | This line can be read two ways: (1) {reading1} (2) {reading2}. | Sayform never guesses between readings. | Write `{symbols1}` or `{symbols2}`. |
+| E0109 | E | reserved word used as a name | `{word}` is a reserved word. | Reserved words can never be names. | Rename it, for example `{word}-value`. |
+| E0110 | E | bare `a is b` between values | `{a} is {b}` compares two values with `is`. | `is` is for types, predicates and comparison phrases. | Write `{a} equals {b}`. |
+| E0111 | E | `=` used as assignment | `{name} = …` looks like assignment. | `=` always means equality. | Write `let {name} be …` or `set {name} to …`. |
+| E0112 | E | `and`/`or`/`not` on a non-Truth | `{op}` needs yes/no values, but got {type}. | Sayform has no truthiness. | For a default use `or else`; otherwise compare explicitly. |
+| E0113 | E | name declared with both `-` and `_` | `{a}` and `{b}` are the same name. | `-` and `_` are interchangeable in names. | Keep one declaration. |
+| E0115 | E | unknown adjective | No predicate `is-{adj}` exists for `{x} is {adj}`. | Adjectives call a function named `is-ADJ`. | Did you mean {suggestions}? |
+| E0119 | — | *retired* (was: `its` with no possessor; `its` removed in spec 0.1-lite) | — | — | — |
+| E0120 | E | note inside an expression | A `note:` appears inside an expression. | Notes attach to declarations and statements. | Move the note above the statement. |
+| E0121 | E | comparison chain | `{text}` chains comparisons. | Only `lo < x < hi`-style between chains are allowed. | Write `{x} is between {lo} and {hi}` or split with `and`. |
+| E0124 | E | non-ASCII name under `strict` | `{word}` contains non-ASCII letters. | `strict` limits names to ASCII to avoid look-alike characters. | Rename using ASCII letters. |
+| E0126 | E | naming case | `{word}` starts with the wrong case for a {kind}. | Types are Capitalised; values, functions and fields are not. | Write `{suggested}`. |
+| E0130 | E | syntax error | Unexpected `{token}` here. | Expected {expected}. | {hint, e.g. put statements inside `to main`}. |
+| E0131 | E | block structure | {expected an indented block / unexpected indent / dedent does not match}. | Blocks open with `:` and are indented one level. | Indent the next line by 4 spaces more than `{opener}`. |
+| E0135 | E | bad number literal | `{text}` is not a valid number. | Numbers have no leading zeros, separators or suffixes (exponents only after `approx`). | Write `{suggested}`. |
+| E0136 | E | bad escape | `\{c}` is not a valid escape. | Escapes are `\\ \" \{ \} \n \t \u{…}`. | Write `\\{c}` for a literal backslash. |
+| E0181 | E | literal index 0 | `{expr}[0]` asks for item 0. | Sayform counts from 1. | The first item is `{expr}[1]` or `first of {expr}`. |
+| W0114 | W | contextual word bound as a name | `{word}` is a contextual keyword. | It is a keyword in some positions and may read confusingly. | Consider another name. |
+| W0116 | W | `and`/`or` mixed | `and` and `or` are mixed without brackets. | `and` binds tighter, which readers often miss. | Add brackets (`say fmt` does this). |
+
+### Group 02 · types
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0201 | E | type mismatch | Expected {expected}, got {actual}. | {context}. | {fix}. |
+| E0202 | E | Text combined with a number | `{a} {op} {b}` mixes text and a number. | There is no implicit conversion. | Write `"{a}{{b}}"` or convert explicitly. |
+| E0203 | E | unit dimension mismatch | `{a}` is {dim1} but `{b}` is {dim2}. | Only quantities of one dimension can be added or compared. | Convert one side or fix the units. |
+| E0204 | E | currency mismatch | `{a}` is {ccy1} but `{b}` is {ccy2}. | Currencies never convert implicitly. | Use `convert … to … with rate …`. |
+| E0205 | E | missing annotation under `strict` | `{name}` is exported without type annotations. | `strict` requires typed exports. | Add `giving …` and parameter types. |
+| E0206 | E | unknown field | `{type}` has no field `{field}`. | Fields come from the record declaration. | Did you mean `{suggestion}`? |
+| E0207 | E | problem kind not declared | `{kind}` can be passed on here but `{fn}` does not declare it. | `may fail with` must list every problem a function can return. | Add `{kind}` to `may fail with`. |
+| E0208 | E | variance violation (v1) | `{type}` is used where `{expected}` is required. | {variance rule}. | {fix}. |
+| E0211 | E | missing field | `{type}` needs `{field}`, which has no default. | Every field without a default must be given. | Add `with {field} …`. |
+| E0212 | P | runtime type mismatch | {operation} got {actual} but needs {expected}. | {reason: not a function / no case matched / call depth limit reached / condition not yes or no}. | {fix}. |
+| W0201 | W | ignored problem | The result of `{call}`, which may fail, is ignored. | A problem returned here would be silently lost. | Use `try`, `or else`, or `let _ be …`. |
+
+### Group 03 · names and binding
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0301 | E | rebinding in the same block | `{name}` is already bound in this block (line {line}). | A block binds each name once. | Use another name, or declare it changeable and `set` it. |
+| E0302 | E | `set` on an immutable name | `{name}` cannot change. | It was bound with `let` without `changeable`. | Write `let {name} be …, changeable` where it is bound. |
+| E0303 | E | `change` on a non-changeable record | `{type}` is not changeable. | Only records declared `changeable` can be mutated. | Use `{value} with {field} …` to make a changed copy. |
+| E0304 | E | unbound name | `{name}` is not defined here. | Names must be bound, imported or in the prelude. | Did you mean {suggestions}? |
+| E0305 | E | star import | `use {module}: *` is not allowed. | Every imported name must be visible in the header. | List the names you use. |
+
+### Group 04 · functions, calls, dispatch, operators
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0401 | E | no matching method | `{fn}` has no method for ({types}). | Dispatch uses the types of all positional arguments. | Available: {signatures}. |
+| E0402 | E | ambiguous methods | Methods at {loc1} and {loc2} are equally specific. | Ambiguity is reported where methods are defined. | Add a more specific method or remove one. |
+| E0403 | E | orphan method | This module owns neither `{fn}` nor any of ({types}). | The orphan rule keeps extensions from going global. | Define it in the module that owns `{fn}` or one of the types. |
+| E0404 | E | conflicting definitions | `{name}` is defined by both {a} and {b}. | Conflicts are never resolved silently. | Remove one dialect or rename. |
+| E0405 | E | role not covered (v0.1) | `{type} plays {role}` lacks {missing}. | Every requirement must be implemented. | Add the missing functions. |
+| E0406 | E | absolute precedence (v0.1) | Operator `{op}` gives no relative precedence. | Precedence is set relative to an existing level. | Write `binds like times` (or `above`/`below`). |
+| E0407 | E | duplicate parameter, lead, field or case | `{name}` appears twice in `{decl}`. | Names and slots in one declaration must be unique. | Rename one. |
+| E0408 | E | unknown slot or named argument | `{fn}` has no slot or parameter `{name}`. | Calls may only use declared slots and names. | Available: {params}. |
+| E0409 | E | missing argument | `{fn}` needs `{param}`. | It has no default. | Add `{lead} …`. |
+| E0410 | E | too many or repeated arguments | `{fn}` got {problem}. | Each parameter takes one argument. | Remove the extra argument. |
+
+### Group 05 · effects and capabilities
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0501 | E | effect not declared | `{fn}` uses `{effect}` (via {via}) but does not declare it. | Every function says what it may touch. | Add `needs {effect}`. |
+| E0502 | P | capability missing at run time | No `{effect}` capability is held here. | {reason: it was revoked at the end of a `with` block / the host did not grant it / called through a function value}. | Declare and pass the effect, or keep the call inside the `with` block. |
+| E0503 | P | `evaluate` needs a capability | The evaluated expression uses `{effect}`, which the caller does not hold. | `evaluate` never gains capabilities. | Declare `needs {effect}` on the caller. |
+| E0504 | E | narrowing widens | `{effect} limited to {x}` is not inside the current `{effect}` capability. | Narrowing can only reduce authority. | Narrow to a subset of {current}. |
+| E0505 | E | `quick-script` under `strict` (v0.1) | `quick-script` grants ambient capabilities. | `strict` forbids ambient authority. | Remove `quick-script` and declare `needs`. |
+| E0506 | H | capability refused by host | The host refused `{effect}` for `main`. | {policy source: `--deny`, `say.toml`, or not implemented in this version}. | Run with `--allow {effect}` or remove it from `needs`. |
+
+### Group 06 · concurrency
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0601 | E | `tasks` missing | `{construct}` needs the `tasks` effect. | Concurrency is an effect. | Add `needs tasks`. |
+| E0602 | E | mutable value sent | `{value}` is changeable and cannot be sent. | Tasks share no mutable state. | Send an immutable snapshot (`let s be …`). |
+| E0603 | E | child captures changeable state | Child task uses changeable `{name}`. | Tasks share no mutable state. | Take a snapshot before the block: `let s be {name}`. |
+| E0604 | E | `let` as a `together` child | A `together` child is a bare `let`. | Its binding would be invisible to everyone. | Wrap the work in a function call or move the `let` out. |
+| E0605 | E | `within` limit is not a time | `{expr}` is not a time quantity. | Deadlines are durations. | Write `within 5 seconds:`. |
+| E0606 | E | `several` not declared | Two or more children can fail, so `several` can be returned. | One problem passes through; two or more become `several` (D6). | Add `several` to `may fail with`. |
+| E0610 | P | send on a closed channel | `send` on a closed channel. | Sending after `close` is a bug. | Stop sending before closing. |
+| E0611 | P | channel closed twice | `close` on a closed channel. | Closing twice is a bug. | Close once, in the producer. |
+| E0612 | P | deadlock | Every task is blocked: {list}. | No task can make progress. | Check channel capacities and close producers. |
+
+### Group 07 · modules, packages, dialects, foreign
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0701 | E | module path or cycle | {module name `{m}` does not match path `{p}` / import cycle {cycle}}. | Modules are found by path and load in a fixed order. | Rename the module or move the file / break the cycle. |
+| E0702 | E | header order | `{line}` is out of order in the header. | Order is module, edition, use, needs, dialect. | Move it (`say fmt`). |
+| E0703 | E | package hash mismatch (v0.1) | `{pkg}` hashes to {actual}, lockfile says {expected}. | The package changed after it was locked. | Re-run `say lock` after reviewing the change. |
+| E0704 | E | dialect beyond lowering | `{construct}` in dialect `{d}` does not lower to core. | Dialects add sugar, not semantics. | Express it as functions and core forms. |
+| E0705 | E | two dialects claim one word | `{word}` is claimed by `{a}` and `{b}`. | Conflicts are errors. | Enable only one of them. |
+| E0706 | E | unknown dialect | No dialect `{d}`. | Dialects are modules or edition built-ins. | Available: {list}. |
+| E0711 | E | `[ ]` on a foreign value (v0.1) | `{expr}` is a foreign value. | Sayform's 1-based indexing never applies to foreign values. | Use `foreign-item {k} of {expr}`. |
+| E0712 | E | unbounded `foreign` under `strict` | `{fn}` needs unbounded `foreign`. | Foreign code can bypass capability checks. | Narrow to `foreign limited to "subprocess"` (v1) or drop `strict`. |
+
+### Group 08 · values
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0801 | E | approx where exact is required | `{expr}` is approx but {context} needs an exact number. | Exactness is preserved unless you opt out. | Use an exact value or `round`. |
+| E0802 | E | range step 0 | The range step is 0. | A zero step never advances. | Use a non-zero step. |
+| E0803 | E/P | mixed sort keys | Keys include {types}. | Mixed types have no order. | Sort by one key type. |
+| E0821 | E | duplicate literal key or item | `{key}` appears twice in this literal. | It would be silently dropped. | Remove one. |
+| E0831 | P | index 0 at run time | Index evaluated to 0. | Sayform counts from 1. | Use `i + 1` or `first of`. |
+| E0832 | P | index out of range or key missing | {index/key} is not in `{expr}` (size {n}). | Missing items are bugs unless asked for. | Use `{expr}?[…]` / `…, if any`. |
+| E0841 | P | division by zero | `{a} {op} 0`. | Dividing by exact zero has no value. | Check first, or use `checked-divide`. |
+| E0842 | P | negative base with fractional exponent | `{a} ^ {b}` has no real value. | The result would be complex. | Use an integer exponent or a non-negative base. |
+
+### Group 09 · symbolic and patterns
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E0901 | E | unquote outside quote | `~{e}` is outside a quote. | `~` splices into quoted code only. | Remove `~` or wrap in `quote (…)`. |
+| E0902 | E | unbound pattern variable on the right | `?{v}` is not bound on the left. | The template can only use matched pieces. | Bind `?{v}` on the left or remove it. |
+| E0903 | E | global or loose rule | {rule outside a ruleset / attempt to apply a ruleset implicitly}. | Rules are always scoped and applied explicitly. | Put the rule in a `ruleset` and use `simplify … using …`. |
+| E0904 | E | `or`-pattern bindings differ | Alternatives bind {a} vs {b}. | Every alternative must bind the same names and types. | Bind the same names in each. |
+| E0905 | E | refutable pattern in `let`/`for` | `{pattern}` might not match. | `let` and `for` cannot fail to bind. | Use `match`. |
+| W0911 | W | non-exhaustive match | Cases do not cover {missing}. | An unmatched value would panic. | Add the cases or `otherwise:`. |
+| W0912 | W | rewrite budget reached | `{op}` stopped at {nodes} nodes / {steps} steps. | Saturation was bounded. | Raise `with nodes …`/`with steps …` or simplify the ruleset. |
+
+### Group 10 · tooling, tests, editions
+| Code | K | Meaning | What | Why | Try this |
+|---|---|---|---|---|---|
+| E1001 | E | round-trip violation (internal) | Printing and re-parsing changed the core at {path}. | This is an implementation bug. | Report it with `say core` output. |
+| E1002 | E | unknown node for this core version | Tag {tag} is unknown to `sayform/core/1`. | The serialiser only encodes known nodes. | Use a matching implementation version. |
+| E1004 | E | `check` inside a function | `check` appears inside `{fn}`. | Checks live at module top level or in test files. | Move it to top level or a `.test.say` file. |
+| E1005 | E | malformed note example | `example:` line {line} is not `CALL gives VALUE` or `CALL fails with KIND`. | Note examples run as tests. | Fix the line. |
+| E1011 | E | not in this edition | `{construct}` is not available in edition {n}. | Editions fix the language surface. | Use `edition {m}` or remove it. |
+| E1012 | E/W | `edition` missing | The module has no `edition` line. | `strict` requires it (warning otherwise; edition 0 assumed). | Add `edition 0`. |
+| E1013 | E | not implemented in this version | `{construct}` is specified for {profile} but this implementation is {version}. | v0 implements the v0 profile only. | Avoid it for now or use a later version. |
+
+## 3. Runtime problem kinds (values, not codes)
+`division-by-zero`, `no-such-field`, `not-found`, `invalid`, `timed-out`, `several`, `capability-revoked`, `foreign-error`, `currency-mismatch`, `empty-list`, `parse-error`.

@@ -1,0 +1,11 @@
+Sayform
+Copyright 2026 ao3575911 (https://github.com/ao3575911)
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The Unicode data tables in src/sayform/_unicode/ are generated from the Unicode
+Character Database 15.1.0 (https://www.unicode.org/Public/15.1.0/ucd/), used under
+the Unicode License v3 (https://www.unicode.org/license.txt).
+
+The optional atHome capability adapter (https://github.com/ao3575911/atHome, AGPL-3.0)
+is not part of this repository and is never vendored or imported by it.

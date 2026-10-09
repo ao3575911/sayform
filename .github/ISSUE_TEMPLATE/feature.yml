@@ -1,0 +1,16 @@
+name: Feature
+description: Propose a feature. It must fit a roadmap phase in spec/17-roadmap-kill.md.
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: phase
+    attributes: {label: Roadmap phase, options: [v0, v0.1, v1]}
+    validations: {required: true}
+  - type: textarea
+    id: spec
+    attributes: {label: Spec reference, description: Cite the spec/17 item this belongs to.}
+    validations: {required: true}
+  - type: textarea
+    id: proposal
+    attributes: {label: Proposal}
+    validations: {required: true}

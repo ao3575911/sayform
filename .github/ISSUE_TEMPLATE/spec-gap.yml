@@ -1,0 +1,21 @@
+name: Spec gap
+description: The spec is silent, ambiguous or contradicts itself.
+title: "spec: <file> §<n> — <problem>"
+labels: [spec-gap]
+body:
+  - type: input
+    id: file
+    attributes: {label: File, placeholder: 03-grammar.md}
+    validations: {required: true}
+  - type: input
+    id: section
+    attributes: {label: Section}
+    validations: {required: true}
+  - type: textarea
+    id: quote
+    attributes: {label: Quote, description: The exact spec text.}
+    validations: {required: true}
+  - type: textarea
+    id: reading
+    attributes: {label: Proposed reading, description: The most conservative reading and why.}
+    validations: {required: true}

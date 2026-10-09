@@ -1,0 +1,311 @@
+(* =====================================================================
+   Sayform edition 0 grammar · spec 0.1-lite · 10 Oct 2026
+   One grammar accepts the words surface (W), the symbols surface (S)
+   and any mix of the two. Alternatives are tagged (* W *) / (* S *);
+   untagged productions are shared. Both surfaces lower to one core
+   (04-core-ast.md). Normative prose and disambiguation: 03-grammar.md.
+
+   Notation (ISO/IEC 14977 style):
+     a = b ;      definition          "x"   terminal (keyword or symbol)
+     [ a ]        optional            { a } zero or more
+     a | b        alternative         (* *) comment
+   Tokens from 02-lexical.md: WORD, TYPENAME (WORD with uppercase
+   initial), INTEGER, DECIMAL, APPROXLIT, TEXT (with interpolation parts),
+   DURATION, SYMBOLLIT ('x), PATVAR (?x), NEWLINE, INDENT, DEDENT, EOF,
+   NOTE (note text), plus the literal keywords and operator tokens.
+   Contextual words appear quoted like keywords; they are keywords
+   only in the positions written here (02-lexical.md §6).
+   ===================================================================== *)
+
+(* ---------- 1. File and header ---------- *)
+file          = { NEWLINE } [ header ] { top_item } EOF ;
+header        = module_line [ edition_line ] { use_line } [ needs_line ] [ dialect_line ] ;
+module_line   = "module" qname NEWLINE ;
+edition_line  = "edition" INTEGER NEWLINE ;
+use_line      = "use" qname [ ":" word_list ] [ "as" WORD ] NEWLINE
+              | "use" foreign_lang ( qname | TEXT ) [ "as" WORD ] NEWLINE ;      (* v0.1 *)
+foreign_lang  = "python" | "c" | "wasm" ;
+needs_line    = "needs" effect_row NEWLINE ;
+dialect_line  = "dialect" qname { "," qname } NEWLINE ;
+qname         = WORD { "." WORD } ;
+word_list     = WORD { "," WORD } ;
+
+top_item      = note_block
+              | func_def | record_def | variant_def | ruleset_def
+              | role_def | plays_def | effect_def | dialect_def       (* v0.1 *)
+              | check_decl
+              | top_let ;
+top_let       = let_stmt NEWLINE ;      (* immutable only; value MUST be pure (SAY-E0501) *)
+
+(* ---------- 2. Effects ---------- *)
+effect_row    = effect_item { ( "and" | "," ) effect_item } ;     (* W prints "and", S prints "," *)
+effect_item   = WORD [ "limited" "to" pc_arg [ "," "read" "only" ] ] ;
+
+(* ---------- 3. Functions ---------- *)
+func_def      = func_head ":" block ;
+func_head     = "to" WORD [ params_w ] [ "giving" type_w ] { "," fn_clause }            (* W *)
+              | "def" WORD [ "[" tparam_s { "," tparam_s } "]" ]
+                "(" [ param_s { "," param_s } ] ")" [ "->" type_s ]
+                [ "needs" effect_row ] [ "fails" WORD { "," WORD } ] ;                  (* S *)
+params_w      = param_w { param_w } ;
+param_w       = [ lead ] WORD [ "(" type_w [ "," "default" expr ] ")" ] ;
+param_s       = [ lead ] WORD [ ":" type_s ] [ "=" expr ] ;
+lead          = "of" | "to" | "from" | "by" | "into" | "for" | "with" ;
+fn_clause     = "needs" effect_row
+              | "may" "fail" "with" WORD { "and" WORD }
+              | "for" "any" TYPENAME { "and" TYPENAME } [ "that" "plays" qname ]       (* plays: v0.1 *)
+              | "explained" "as" TEXT ;                                                 (* v0.1 *)
+tparam_s      = TYPENAME [ ":" qname ] ;
+
+(* ---------- 4. Data declarations ---------- *)
+record_def    = article TYPENAME [ "of" TYPENAME { "and" TYPENAME } ] [ plural ]
+                "has" ( field_w { ( "," | "and" ) field_w } { "," record_mod } NEWLINE
+                      | ":" NEWLINE INDENT field_w NEWLINE { field_w NEWLINE }
+                        { record_mod NEWLINE } DEDENT )                                 (* W *)
+              | [ "var" ] "record" TYPENAME [ "[" TYPENAME { "," TYPENAME } "]" ] [ plural ]
+                "(" field_s { "," field_s } ")" [ "where" expr ] NEWLINE ;              (* S *)
+record_mod    = "changeable" | "where" expr ;
+plural        = "(" "plural" WORD ")" ;
+field_w       = article WORD "(" type_w [ "," "default" expr ] ")" ;
+field_s       = WORD ":" type_s [ "=" expr ] ;
+variant_def   = article TYPENAME [ "of" TYPENAME { "and" TYPENAME } ] [ plural ]
+                "is" "one" "of" ":" NEWLINE INDENT case_w { case_w } DEDENT             (* W *)
+              | "variant" TYPENAME [ "[" TYPENAME { "," TYPENAME } "]" ] [ plural ]
+                ":" NEWLINE INDENT case_s { case_s } DEDENT ;                           (* S *)
+case_w        = WORD [ "with" field_w { ( "," | "and" ) field_w } ] NEWLINE ;
+case_s        = WORD [ "(" field_s { "," field_s } ")" ] NEWLINE ;
+article       = "a" | "an" ;
+
+(* v0.1 declarations: parsed in edition 0, rejected by a v0 implementation with SAY-E1013 *)
+role_def      = "role" TYPENAME [ "of" TYPENAME ] ":" NEWLINE INDENT
+                func_head NEWLINE { func_head NEWLINE } DEDENT ;
+plays_def     = type_any "plays" qname ":" NEWLINE INDENT func_def { func_def } DEDENT ;
+effect_def    = "effect" WORD [ "," "limited" "by" WORD ] NEWLINE ;
+dialect_def   = "dialect" WORD ":" NEWLINE INDENT
+                { operator_def | func_def | ruleset_def } DEDENT ;
+operator_def  = "operator" TEXT [ "(" "symbol" TEXT ")" ] "with" INTEGER "operands" ","
+                "binds" ( "like" | "above" | "below" ) WORD "," ( "left" | "right" ) "to" ( "left" | "right" ) ","
+                "means" qname NEWLINE ;
+
+(* ---------- 5. Rulesets ---------- *)
+ruleset_def   = "ruleset" WORD ":" NEWLINE INDENT rule_line { rule_line } DEDENT ;
+rule_line     = "rewrite" expr "as" expr [ "when" expr ] NEWLINE                        (* W *)
+              | expr "=>" expr [ "if" expr ] NEWLINE ;                                  (* S *)
+              (* PATVAR is allowed in the left side; right side may use PATVARs bound on the left *)
+
+(* ---------- 6. Tests and notes ---------- *)
+check_decl    = "check" "that" expr [ "fails" "with" WORD ] NEWLINE                     (* W *)
+              | "check" expr [ "fails" WORD ] NEWLINE                                    (* S *)
+              | "check" TEXT ":" block ;
+note_block    = "note" ":" NOTE NEWLINE ;
+              (* NOTE spans the rest of the line and following deeper-indented lines.
+                 A note line "example: CALL gives VALUE" or "example: CALL fails with KIND"
+                 is parsed as an expression pair (13-tooling.md §5). *)
+
+(* ---------- 7. Blocks and statements ---------- *)
+block         = NEWLINE INDENT stmt_line { stmt_line } DEDENT ;
+stmt_line     = simple_stmt NEWLINE | compound_stmt | note_block ;
+simple_stmt   = let_stmt | set_stmt | add_stmt | change_stmt | return_stmt
+              | "stop" | "skip" | "break" | "continue"
+              | expr ;                                           (* expression statement *)
+compound_stmt = if_stmt | match_stmt | for_stmt | repeat_stmt | while_stmt
+              | with_stmt | together_stmt | within_stmt | let_block | return_block ;
+
+let_stmt      = "let" pattern [ ":" type_any ] "be" expr [ "," "changeable" ]            (* W *)
+              | "let" pattern [ ":" type_any ] "=" expr                                  (* S *)
+              | "var" pattern [ ":" type_any ] "=" expr ;                                (* S *)
+let_block     = ( "let" pattern [ ":" type_any ] ( "be" | "=" ) | "var" pattern [ ":" type_any ] "=" )
+                block_expr ;
+set_stmt      = "set" WORD "to" expr                                                    (* W *)
+              | WORD ":=" ( expr | block_expr ) ;                                       (* S *)
+add_stmt      = "add" pc_arg "to" WORD                                                  (* W *)
+              | WORD "+=" expr ;                                                        (* S *)
+change_stmt   = "change" "the" WORD "of" expr "to" expr                                 (* W *)
+              | postfix "." WORD ":=" expr ;                                            (* S *)
+return_stmt   = "give" "back" [ expr ]                                                  (* W *)
+              | "return" [ expr ] ;                                                     (* S *)
+return_block  = ( "give" "back" | "return" ) block_expr ;
+
+if_stmt       = "if" expr ":" block
+                { ( "otherwise" "if" | "elif" ) expr ":" block }
+                [ ( "otherwise" | "else" ) ":" block ] ;
+match_stmt    = "match" expr ":" NEWLINE INDENT case_clause { case_clause }
+                [ ( "otherwise" | "else" ) ":" block ] DEDENT ;
+case_clause   = "when" pattern [ "," "if" expr ] ":" block                              (* W *)
+              | "case" pattern [ "if" expr ] ":" block ;                                (* S *)
+for_stmt      = "for" "each" pattern "in" expr ":" block                                (* W *)
+              | "for" "each" pattern "received" "from" expr ":" block                   (* W *)
+              | "for" pattern "in" expr ":" block ;                                     (* S *)
+repeat_stmt   = "repeat" expr "times" ":" block ;                                       (* W *)
+while_stmt    = "while" expr ":" block ;
+with_stmt     = "with" WORD "limited" "to" pc_arg [ "," "read" "only" ] ":" block ;
+together_stmt = "together" ":" NEWLINE INDENT stmt_line { stmt_line } DEDENT ;
+within_stmt   = "within" pc_arg ":" block ;
+
+block_expr    = ( "all" "of" | "all-of" ) ":" child_block
+              | ( "first" "of" | "first-of" ) ":" child_block ;
+child_block   = NEWLINE INDENT child { child } DEDENT ;
+child         = [ WORD ":" ] expr NEWLINE ;
+
+(* ---------- 8. Expressions (precedence ladder, low to high) ---------- *)
+expr          = pipeline ;                                                     (* P1 *)
+pipeline      = absence { ( "then" | "|>" ) pipe_target } ;
+pipe_target   = callee { slot_arg } [ named_args ] ;
+absence       = logic_or [ ( "or" "else" | "??" ) absence ] ;                  (* P2, right *)
+logic_or      = logic_and { ( "or" | "||" ) logic_and } ;                      (* P3 *)
+logic_and     = logic_not { ( "and" | "&&" ) logic_not } ;                     (* P4 *)
+logic_not     = ( "not" | "!" ) logic_not | comparison ;                       (* P5 *)
+comparison    = clause_expr [ comp_tail ] ;                                    (* P6 *)
+comp_tail     = sym_cmp clause_expr [ sym_cmp clause_expr ]        (* 2nd operator: between-form only, else SAY-E0121 *)
+              | "equals" clause_expr
+              | "contains" clause_expr
+              | "matches" clause_expr
+              | "is" is_tail ;
+sym_cmp       = "=" | "==" | "!=" | "≠" | "<" | "<=" | "≤" | ">" | ">=" | "≥"
+              | "===" | "in" | "∈" | "~=" | "≡" ;      (* "≡" requires a following "using" WORD *)
+is_tail       = [ "not" ] ( article type_w                    (* type test *)
+                          | "nothing"
+                          | "in" clause_expr
+                          | "less" "than" clause_expr
+                          | "greater" "than" clause_expr
+                          | "at" "least" clause_expr
+                          | "at" "most" clause_expr
+                          | "equal" "to" clause_expr
+                          | "the" "same" "as" clause_expr
+                          | "between" clause_expr "and" clause_expr
+                            [ "," "exclusive" [ "above" | "below" ] ]
+                          | type_s                            (* S: x is Number *)
+                          | WORD )                            (* adjective predicate: is-WORD *)
+              | "equivalent" "to" clause_expr "using" WORD ;
+
+clause_expr   = range_expr { postfix_clause } ;                                (* P7 *)
+postfix_clause= "where" cond                                   (* filter, implicit it *)
+              | "each" cond                                    (* map, implicit it *)
+              | "sorted" [ "by" range_expr ] [ "," "descending" ]
+              | "grouped" "by" range_expr
+              | "joined" "with" range_expr                     (* = ++ *)
+              | "joined" "by" range_expr                       (* join_all *)
+              | "++" range_expr
+              | "in" UNITWORD ;                                (* dialect units: convert *)
+
+(* cond: the body of a where/each clause. It is parsed at P2..P8 but its
+   operands are range_expr (no postfix clauses), so a following clause
+   attaches to the outer collection (03-grammar.md §4 rule R2). *)
+cond          = c_or [ ( "or" "else" | "??" ) cond ] ;
+c_or          = c_and { ( "or" | "||" ) c_and } ;
+c_and         = c_not { ( "and" | "&&" ) c_not } ;
+c_not         = ( "not" | "!" ) c_not | c_cmp ;
+c_cmp         = range_expr [ c_tail ] ;
+c_tail        = sym_cmp range_expr [ sym_cmp range_expr ]
+              | "equals" range_expr
+              | "contains" range_expr
+              | "matches" range_expr
+              | "is" c_is_tail ;
+c_is_tail     = [ "not" ] ( article type_w | "nothing" | "in" range_expr
+                          | "less" "than" range_expr | "greater" "than" range_expr
+                          | "at" "least" range_expr | "at" "most" range_expr
+                          | "equal" "to" range_expr | "the" "same" "as" range_expr
+                          | "between" range_expr "and" range_expr
+                            [ "," "exclusive" [ "above" | "below" ] ]
+                          | type_s | WORD )
+              | "equivalent" "to" range_expr "using" WORD ;
+
+range_expr    = additive [ ( ".." | "..<" ) additive [ "by" additive ] ] ;    (* P8, non-assoc *)
+additive      = multiplicative { ( "+" | "-" | "plus" | "minus" ) multiplicative } ;          (* P9 *)
+multiplicative= unary { ( "*" | "/" | "//" | "%" | "times" | "mod"
+                        | "divided" "by" ) unary [ "," "rounded" "down" ] } ;  (* P10; ", rounded down" only after "divided by" *)
+unary         = ( "negative" | "-" | "try" ) unary | power ;                  (* P11 *)
+power         = app [ ( "^" | "to" "the" "power" "of" ) unary ] ;             (* P12, right *)
+                (* P13 is reserved: unit literals are lexical (dialect units) *)
+app           = pc_call | postfix ;                                            (* P14 *)
+
+(* words-surface prefix call ("juxtaposition"); see 03-grammar.md §4 rule R6 *)
+pc_call       = callee [ "of" ] pc_arg { slot_arg } [ named_args ]
+              | callee slot_arg { slot_arg } [ named_args ]
+              | callee named_args ;
+callee        = WORD { "." WORD } ;
+pc_arg        = unary_nc { postfix_clause } ;
+unary_nc      = ( "negative" | "-" | "try" ) unary_nc | power ;
+slot_arg      = ( "to" | "from" | "by" | "into" | "for" ) pc_arg ;
+named_args    = "with" WORD pc_arg { "and" WORD pc_arg } ;      (* "and" continues only if WORD + operand-start follow (R12) *)
+
+postfix       = primary { "'s" WORD [ "," "if" "any" ]
+                        | "." WORD
+                        | "?." WORD
+                        | "." "with" "(" [ kwargs ] ")"            (* S copy-with *)
+                        | "[" expr "]" [ "," "if" "any" ]
+                        | "?[" expr "]"
+                        | "(" [ call_args ] ")"
+                        | "?" } ;                                   (* postfix try *)
+call_args     = arg { "," arg } ;
+arg           = expr | WORD "=" expr | lead_kw "=" expr ;
+lead_kw       = "to" | "from" | "by" | "into" | "for" ;
+kwargs        = WORD "=" expr { "," WORD "=" expr } ;
+
+primary       = literal
+              | WORD
+              | TYPENAME [ "with" WORD pc_arg { "and" WORD pc_arg } ]         (* W record construction *)
+              | TYPENAME "[" type_s { "," type_s } "]"                        (* S type value *)
+              | "(" expr ")"
+              | "[" [ expr { "," expr } ] "]"
+              | "{" "}"                                                       (* empty map *)
+              | "{" expr ":" expr { "," expr ":" expr } "}"                   (* map *)
+              | "{" expr { "," expr } "}"                                     (* non-empty set *)
+              | SYMBOLLIT | "the" "symbol" WORD
+              | "quote" "(" expr ")" | "`" "(" expr ")"
+              | "~" postfix                                                    (* unquote; only inside quote *)
+              | PATVAR                                                        (* only in patterns, rules, quote patterns *)
+              | "the" "type" type_w
+              | "the" WORD "of" app                                           (* possession, right *)
+              | "item" unary_nc "of" app [ "," "if" "any" ]                   (* 1-based index *)
+              | "problem" WORD [ named_args ]
+              | "from" additive ( "to" | "up" "to" ) additive [ "by" additive ] (* W range *)
+              | lambda
+              | "each" pattern "in" range_expr [ "at" "the" "same" "time" ] "," cond
+              | "evaluate" ( "(" call_args ")" | pc_arg [ named_args ] )
+              | "simplify" pc_arg "using" WORD [ named_args ] ;
+lambda        = "given" WORD { "and" WORD } "," cond                         (* W *)
+              | WORD "=>" cond
+              | "(" [ WORD { "," WORD } ] ")" "=>" cond ;                     (* S *)
+literal       = INTEGER | DECIMAL | APPROXLIT | TEXT | DURATION
+              | MONEYLIT | QUANTITYLIT                                         (* dialects money / units *)
+              | "yes" | "no" | "true" | "false" | "nothing" ;
+
+(* ---------- 9. Types ---------- *)
+type_any      = type_w | type_s ;
+type_w        = type_w1 { "or" type_w1 } ;                    (* "a T or nothing" is optional *)
+type_w1       = [ article ] type_head_w
+              | "anything" | "nothing" | "text" | "money" ;
+type_head_w   = TYPEWORD                                      (* number, integer, decimal, rational, approx,
+                                                                 truth, symbol, expression, problem, type *)
+              | TYPENAME                                      (* user record/variant, type variable *)
+              | ( "list" | "set" ) "of" plural_w
+              | "channel" "of" plural_w
+              | "map" "from" plural_w "to" plural_w
+              | "function" "from" type_w1 { "and" type_w1 } "to" type_w1 [ "," "needs" effect_row ]
+              | "quantity" "of" WORD                          (* dialect units *)
+              | "money" "in" WORD ;                           (* dialect money *)
+plural_w      = PLURALWORD [ "of" plural_w ] | TYPENAME | "text" | "money" | "anything" ;
+type_s        = type_s1 { "|" type_s1 } ;
+type_s1       = TYPENAME [ "[" type_s { "," type_s } "]" ] [ "?" ]
+              | "(" [ type_s { "," type_s } ] ")" "->" type_s [ "needs" effect_row ] ;
+
+(* ---------- 10. Patterns ---------- *)
+pattern       = single { "or" single } ;                      (* alternatives *)
+single        = PATVAR [ "(" type_w ")" | ":" type_s ]
+              | WORD                                          (* let/for/lambda: binder; match case: variant case
+                                                                 name with no fields (03-grammar.md §5.6) *)
+              | "anything" | "_"
+              | literal
+              | "-" ( INTEGER | DECIMAL )
+              | "from" literal "to" literal | literal ".." literal | literal "..<" literal
+              | TYPENAME [ "with" field_pats ]                                 (* W record *)
+              | TYPENAME "(" [ kw_pats ] ")"                                   (* S record *)
+              | WORD "with" field_pats                                         (* W variant case *)
+              | WORD "(" [ kw_pats ] ")"                                       (* S variant case *)
+              | "[" [ pattern { "," pattern } ] [ "," "..." PATVAR ] "]"
+              | "quote" "(" expr ")" | "`" "(" expr ")"
+              | "(" pattern ")" ;
+field_pats    = field_pat { ( "," | "and" ) field_pat } [ "," "and" "more" ] ;
+field_pat     = WORD single | WORD ;                          (* bare WORD means WORD ?WORD *)
+kw_pats       = WORD "=" single { "," WORD "=" single } [ "," "..." ] ;

@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sayform"
+version = "0.0.1.dev0"
+description = "Sayform: a small language that reads like English, prints as symbols, and declares what it may touch."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.12"
+authors = [{ name = "ao3575911" }]
+keywords = ["programming-language", "interpreter", "symbolic-computation", "capabilities"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Interpreters",
+]
+dependencies = ["lark==1.3.1", "blake3>=1.0.11"]
+
+[project.optional-dependencies]
+egglog = ["egglog>=14.0.0"]
+dev = ["pytest>=9.1", "hypothesis>=6.168", "ruff", "mypy"]
+
+[project.scripts]
+say = "sayform.cli:main"
+
+[project.urls]
+Repository = "https://github.com/ao3575911/sayform"
+Specification = "https://github.com/ao3575911/sayform/blob/main/spec/00-README.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sayform"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "prelude", "spec", "tests", "tools", "conformance", "examples", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["src/sayform/_unicode", "src/sayform/codes.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B905"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+files = ["src"]
+exclude = ["src/sayform/_unicode/"]
+
+[[tool.mypy.overrides]]
+module = ["blake3", "egglog", "egglog.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
