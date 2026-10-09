@@ -10,3 +10,6 @@ All notable changes to this project are documented here. The format follows
 - M0: project scaffold, Apache-2.0 licence, spec 0.1-lite imported into `spec/`,
   CI (lint, types, tests, budgets, spec sync, wheel smoke test), `say --version`,
   `tools/check_budgets.py`, `tools/check_spec_sync.py`, generated error registry.
+- M1: lexer for spec/02-lexical.md (UTF-8, BOM, line ends, indentation, words,
+  numbers, text with escapes and interpolation, durations, comments, notes, operators,
+  Unicode aliases) with lexer-level `LEX-01`…`LEX-24` tests.
