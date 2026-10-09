@@ -17,7 +17,7 @@ Work ships milestone by milestone (build plan, section 6). Checked items are mer
 | M | Delivers | State |
 |---|---|---|
 | M0 | Scaffold, licence, spec import, CI, `say --version`, budget and spec-sync checks | done |
-| M1 | Lexer | in progress |
+| M1 | Lexer | done (lexer-level `LEX-*`; fmt and parser parts follow in M2/M3) |
 | M2 | Parser for both surfaces, disambiguation R1–R20 | not started |
 | M3 | Core AST, lowering, printers, `say fmt`, `say core`, SCS-1, `say hash` | not started |
 | M4 | Values and evaluator | not started |
