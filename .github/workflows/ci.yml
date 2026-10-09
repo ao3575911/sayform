@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -35,3 +35,10 @@ jobs:
           python -m venv /tmp/wheel-env
           /tmp/wheel-env/bin/pip install dist/*.whl
           /tmp/wheel-env/bin/say --version
+
+  test:
+    if: always()
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.build.result }}" = success
