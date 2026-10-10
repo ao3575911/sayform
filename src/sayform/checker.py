@@ -50,6 +50,7 @@ def check_module(mod: C.Module, sink: Sink | None = None) -> None:
     for d in mod.body:
         if isinstance(d, C.Func):
             check_tasks(d, funcs)
+    check_dialect(mod, sink)
     header = {e.effect for e in mod.needs}
     if mod.needs and union - header:
         missing = sorted(union - header)[0]
@@ -89,3 +90,25 @@ def check_tasks(fn: C.Func, funcs: dict[str, C.Func]) -> None:
                     raise SayError("E0603", x.line, name=y.name)
         if sum(can_fail(ch.body, funcs) for ch in x.children) >= 2 and "several" not in fn.fails:
             raise SayError("E0606", x.line)
+
+
+def check_dialect(mod: C.Module, sink: Sink | None) -> None:
+    """Exhaustive variant matches (W0911, an error under `strict`) and the `strict` dialect:
+    ASCII names (E0124) and typed exports (E0205) (spec 10 section 2.7)."""
+    strict = "strict" in mod.dialects
+    cases = {c.name: v for v in mod.body if isinstance(v, C.VariantDef) for c in v.cases}
+    for x in C.walk(mod):
+        if isinstance(x, C.Match) and x.else_ is None and all(c.guard is None for c in x.cases):
+            pats = [p for c in x.cases for p in (c.pattern.alts if isinstance(c.pattern, C.PAlt) else (c.pattern,))]
+            if pats and all(isinstance(p, C.PCase) and p.case in cases for p in pats):
+                missing = [c.name for c in cases[pats[0].case].cases if c.name not in {p.case for p in pats}]
+                if missing and strict:
+                    raise SayError("W0911", x.line, severity="error", missing=", ".join(missing))
+                if missing and sink is not None:
+                    sink.warn("W0911", x.line, missing=", ".join(missing))
+        if strict and isinstance(x, (C.Name, C.PBind, C.Func, C.Param)) and not x.name.isascii():
+            raise SayError("E0124", getattr(x, "line", 0), word=x.name)
+    for d in mod.body:
+        if strict and isinstance(d, C.Func) and (d.result is None or any(p.type is None for p in d.params)):
+            if d.name != "main" or any(p.type is None for p in d.params):
+                raise SayError("E0205", d.line, name=d.name)

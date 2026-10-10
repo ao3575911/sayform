@@ -443,7 +443,7 @@ class Parser:
             if "strict" in dialects:
                 raise SayError("E1012", 1, 1)
             if has_header:
-                self.sink.warn("W1012", 1, 1)
+                self.sink.warn("E1012", 1, 1)
             edition = 0
         pending: list[Any] = []
         while self.cur.kind != "EOF":
@@ -511,7 +511,7 @@ class Parser:
                 ns.append(self.word())
             names = tuple(ns)
             for n in ns:
-                self.defs[n] = "import"
+                self.defs[n] = "record" if n[:1].isupper() else "import"
         if self.eat("as"):
             alias = self.word()
         self.modules.add(alias or path.split(".")[-1])
