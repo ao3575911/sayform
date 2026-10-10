@@ -9,11 +9,13 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
 
 from . import CORE_VERSION, EDITION, SPEC_VERSION, __version__
+from . import core as C
 from .diagnostics import SayError, Sink
 
 COMMANDS = ("run", "check", "fmt", "explain", "test", "hash", "core", "repl")
@@ -132,6 +134,184 @@ def run_file(
     return 0
 
 
+def cmd_explain(ns: argparse.Namespace) -> int:
+    from .explain import explain
+
+    path, _, at = ns.file.partition(":") if not Path(ns.file).exists() else (ns.file, "", "")
+    try:
+        _, mod, _ = load(path)
+    except SayError as e:
+        return report(e, path, ns.json)
+    lines = explain(mod, int(at) if at else None)
+    print(json.dumps({"version": "say-json/1", "explanation": lines}) if ns.json else "\n".join(lines))
+    return 0
+
+
+def note_examples(text: str) -> str:
+    """Note `example:` lines become checks (spec 13 section 5.3); malformed ones are SAY-E1005."""
+    out = []
+    for i, ln in enumerate(text.splitlines(), 1):
+        m = re.match(r"\s+example:\s*(.*)$", ln)
+        if not m:
+            continue
+        call, gives, value = m.group(1).rpartition(" gives ")
+        if gives:
+            out.append(f"check that ({call}) equals ({value.rstrip('.')})")
+            continue
+        call, fails, kind = m.group(1).rpartition(" fails with ")
+        if not fails or not call:
+            raise SayError("E1005", i, at_line=i)
+        out.append(f"check that ({call}) fails with {kind.rstrip('.')}")
+    return "\n\n" + "\n".join(out) + "\n" if out else ""
+
+
+def test_files(paths: list[str]) -> list[str]:
+    out: list[str] = []
+    for p in paths:
+        q = Path(p)
+        out += sorted(str(x) for x in q.rglob("*.say")) if q.is_dir() else [p]
+    return out
+
+
+def cmd_test(ns: argparse.Namespace) -> int:
+    """`say test`: 0 all passed, 3 test failures, 2 compile errors (spec 13 section 5)."""
+    from .evaluator import run_checks
+    from .explain import Explainer
+    from .parser import parse
+
+    passed, failed, rows = 0, 0, []
+    for path in test_files(ns.paths):
+        text = Path(path).read_text(encoding="utf-8")
+        try:
+            mod = parse(text + note_examples(text), path, name=Path(path).stem.removesuffix(".test"))
+            results = big_stack(lambda m=mod: run_checks(m, allow=tuple(ns.allow or ()), shuffle=ns.shuffle_tasks))
+        except SayError as e:
+            e.diag.file = e.diag.file or path
+            return report(e, path, ns.json)
+        checks = {n.line: n for n in C.walk(mod) if isinstance(n, C.Check)}
+        for r in results:
+            passed, failed = passed + r.ok, failed + (not r.ok)
+            rows.append({"file": path, "line": r.line, "label": r.label, "ok": r.ok, "expected": r.expected,
+                         "actual": r.actual})  # fmt: skip
+            if r.ok or ns.json:
+                continue
+            if r.error is not None:
+                print(r.error.diag.render(text), file=sys.stderr)
+                continue
+            ex = Explainer(mod)
+            if r.line in checks:
+                ex.check(checks[r.line], 0)
+            why = ex.lines[0].split(": ", 1)[1] if ex.lines else "This check failed."
+            print(f"fail[check]: {r.label or 'check'} failed\n  --> {path}:{r.line}:1\n what: expected "
+                  f"{r.expected}, actual {r.actual}.\n  why: {why}\n  try: Fix the code or the expected value.\n",
+                  file=sys.stderr)  # fmt: skip
+    if ns.json:
+        print(json.dumps({"version": "say-json/1", "tests": rows, "passed": passed, "failed": failed}))
+    else:
+        print(f"{passed} passed, {failed} failed")
+    return 3 if failed else 0
+
+
+def cmd_check(ns: argparse.Namespace) -> int:
+    """`say check`: parse, resolve and static checks; 0 clean, 2 errors (warnings too with --strict)."""
+    from .checker import check_module
+
+    status, diags = 0, []
+    for path in ns.paths:
+        sink = Sink()
+        try:
+            _, mod, _ = load(path, sink)
+            check_module(mod, sink)
+        except SayError as e:
+            e.diag.file = e.diag.file or path
+            sink.items.append(e.diag)
+            status = 2
+        text = Path(path).read_text(encoding="utf-8")
+        for d in sink.items:
+            d.file = d.file or path
+            status = 2 if ns.strict or d.severity != "warning" else status
+            diags.append(d.to_json()) if ns.json else print(d.render(text), file=sys.stderr)
+    if ns.json:
+        print(json.dumps({"version": "say-json/1", "diagnostics": diags}))
+    return status
+
+
+def repl(read: Any = input, write: Any = print) -> int:
+    """The REPL (spec 13 section 4): echoes canonical input, starts with `console` only."""
+    from .evaluator import program
+    from .explain import Explainer
+    from .parser import parse
+    from .printer import print_module
+    from .scs import hash_module, show_hash
+
+    surface, caps = "words", ["console"]
+    defs: list[str] = []
+    lets: list[str] = []
+
+    def source(body: list[str]) -> str:
+        need = " and ".join(caps)
+        main = "".join("    " + x + "\n" for b in body for x in b.splitlines()) or "    give back nothing\n"
+        return f"edition 0\nneeds {need}\n\n" + "\n\n".join(defs) + f"\n\nto main, needs {need}:\n{main}"
+
+    while True:
+        try:
+            line = read("say> ")
+        except EOFError:
+            return 0
+        while line.rstrip().endswith(":") and not line.startswith(":"):
+            more = read("...  ")
+            if not more.strip():
+                break
+            line += "\n" + more
+        cmd, _, arg = line.strip().partition(" ")
+        try:
+            if cmd == ":quit":
+                return 0
+            elif cmd in (":words", ":symbols"):
+                surface = cmd[1:]
+            elif cmd == ":caps":
+                write(", ".join(caps))
+            elif cmd == ":grant":
+                if read(f"Grant {arg} to the REPL? (yes/no) ").strip() == "yes":
+                    caps.append(arg.split()[0])
+            elif cmd == ":load":
+                defs.append(Path(arg).read_text(encoding="utf-8").split("\n", 1)[1])
+            elif cmd in (":core", ":explain", ":type"):
+                mod = parse(source([*lets, f"show ({arg})"]))
+                stmt = mod.body[-1].body.stmts[-1].expr.args[0]
+                if cmd == ":core":
+                    write(repr(stmt))
+                elif cmd == ":explain":
+                    write(Explainer(mod).np(stmt))
+                else:
+                    from .values import kind
+
+                    write(kind(program(parse(source([*lets, f"give back ({arg})"])), write)[1]))
+            elif cmd == ":hash":
+                defs_h, _ = hash_module(parse(source([])))
+                write(show_hash(defs_h[arg]) if arg in defs_h else f"no definition named {arg}")
+            elif not line.strip():
+                continue
+            else:
+                is_def = line.startswith(("to ", "def ", "ruleset ")) or " has " in line.split("\n")[0]
+                body = [] if is_def else [*lets, line]
+                trial = source(body) if not is_def else source([]).replace("\n\nto main", "\n\n" + line + "\n\nto main")
+                mod = parse(trial)
+                printed = print_module(mod, surface)
+                chunk = printed.split("\n\n\n")[-2 if is_def else -1].strip()
+                write(chunk if is_def else chunk.splitlines()[-1].strip())
+                if is_def:
+                    defs.append(line)
+                elif line.startswith(("let ", "var ")):
+                    lets.append(line)
+                else:
+                    program(mod, write)
+        except SayError as e:
+            write(e.diag.render())
+        except (KeyError, OSError, IndexError) as e:
+            write(f"error: {e}")
+
+
 def read_line() -> str | None:
     line = sys.stdin.readline()
     return line.rstrip("\n") if line else None
@@ -191,21 +371,35 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--deny", action="append", help="refuse an effect (host policy)")
     p.add_argument("--shuffle-tasks", type=int, metavar="SEED", help="perturb the task ready queue deterministically")
     p.add_argument("args", nargs="*", help="program arguments after `--`")
-    for name in ("check", "explain", "test", "repl"):
-        p = sub.add_parser(name)
-        p.add_argument("args", nargs=argparse.REMAINDER)
+    p = sub.add_parser("explain", help="explain a program in English")
+    p.add_argument("file", help="FILE or FILE:LINE")
+    p.add_argument("--json", action="store_true")
+    p = sub.add_parser("check", help="parse and run static checks")
+    p.add_argument("paths", nargs="+")
+    p.add_argument("--strict", action="store_true")
+    p.add_argument("--json", action="store_true")
+    p = sub.add_parser("test", help="run checks and note examples")
+    p.add_argument("paths", nargs="+")
+    p.add_argument("--allow", action="append", help="grant a real effect to tests")
+    p.add_argument("--shuffle-tasks", type=int, metavar="SEED")
+    p.add_argument("--json", action="store_true")
+    sub.add_parser("repl", help="interactive session")
     ns = ap.parse_args(argv)
     if ns.version:
         print(version_text())
         return 0
-    handler = {"fmt": cmd_fmt, "hash": cmd_hash, "core": cmd_core, "run": cmd_run}.get(ns.command or "")
+    handler = {
+        "fmt": cmd_fmt,
+        "hash": cmd_hash,
+        "core": cmd_core,
+        "run": cmd_run,
+        "explain": cmd_explain,
+        "check": cmd_check,
+        "test": cmd_test,
+    }.get(ns.command or "")
     if handler is not None:
         return handler(ns)
-    if ns.command is None:
-        ap.print_help()
-        return 0
-    print(f"say {ns.command}: not available in {__version__} yet (see README status table).", file=sys.stderr)
-    return 2
+    return repl()
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ Work ships milestone by milestone (build plan, section 6). Checked items are mer
 | M6 | 53 host primitives and the 21-function prelude | done for core/console/numbers/text/collections/host modules + 21-function prelude (`LIB-*`, G-14); symbolic and task primitives land with M7/M8 |
 | M7 | Symbolic: quote, `evaluate`, rulesets, `simplify` | done (`SYM-01`…`SYM-23`, G-08; the optional egglog backend `SYM-24` is v0.1) |
 | M8 | Concurrency: `together`, `all of`, `first of`, `within`, channels | done (`CON-01`…`CON-22`) |
-| M9 | Tooling: `say run/check/test/explain`, REPL, diagnostics | not started |
+| M9 | Tooling: `say run/check/test/explain`, REPL, diagnostics | done (`TOOL-*`, `EXP-*`, `TEST-*`, `ERR-FORMAT`/`ERR-RETIRED`; per-code `ERR-*` rows partial, see issues) |
 | M10 | Modules and the `strict` dialect | not started |
 | M11 | Golden programs G-01 to G-14, README demo, release 0.0.1 | not started |
 

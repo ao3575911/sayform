@@ -909,7 +909,9 @@ class CheckResult:
     error: Any = None
 
 
-def run_checks(mod: C.Module, write: Any = None, seed: int = 0, allow: tuple[str, ...] = ()) -> list[CheckResult]:
+def run_checks(
+    mod: C.Module, write: Any = None, seed: int = 0, allow: tuple[str, ...] = (), shuffle: int | None = None
+) -> list[CheckResult]:
     """Run a module's top-level checks (spec 13 section 5) with test capabilities: a captured
     console, virtual clock and tasks, seeded random; other effects only when allowed."""
     from .checker import check_module
@@ -919,6 +921,7 @@ def run_checks(mod: C.Module, write: Any = None, seed: int = 0, allow: tuple[str
         _PRELUDE.append(prelude_module())
     ev = Evaluator(write or (lambda text, end="\n": None))
     ev.globals["empty-set"] = SetV(())
+    ev.shuffle = shuffle
     ev.rng.seed(seed)
     ev.clock = Decimal(0)
     ev.run(ev.load(_PRELUDE[0]))
@@ -958,7 +961,8 @@ def check_one(ev: Evaluator, n: C.Check, env: Env, out: list[CheckResult], label
             from .symbolic import match_expr  # type: ignore[import-untyped, unused-ignore]
 
             pat = yield from ev.ev(n.expected, env)
-            ok, exp = match_expr(pat.node, got.node) is not None, display(pat)
+            pn = pat.node.expr if isinstance(pat.node, C.Quote) else pat.node
+            ok, exp = match_expr(pn, got.node) is not None, display(pat)
         else:
             ok, exp = got is True, "yes"
         out.append(CheckResult(label, n.line, ok, exp, display(got, True)))
