@@ -7,6 +7,8 @@ parser assigned; closures share their defining cells (capture by reference).
 
 from __future__ import annotations
 
+import os
+import random
 from collections.abc import Generator
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -53,14 +55,60 @@ class Env:
 
 
 class Capability:
-    """An unforgeable capability value (spec 09 section 2)."""
+    """An unforgeable, immutable capability value (spec 09 section 2). `limit` is a resolved
+    directory (files) or an integer (tasks); `backing` is an optional CapabilityBacking."""
 
-    def __init__(self, effect: str, narrowing: tuple[Any, ...] = (), revoked: bool = False) -> None:
-        self.effect, self.narrowing, self.revoked = effect, narrowing, revoked
+    NARROWABLE = {"files", "tasks", "network", "environment", "processes"}
 
-    def check(self) -> None:
-        if self.revoked:
-            raise panic("E0502", effect=self.effect, reason="it was revoked at the end of a `with` block")
+    def __init__(self, effect: str, limit: Any = None, read_only: bool = False, backing: Any = None) -> None:
+        self.effect, self.limit, self.read_only, self.backing = effect, limit, read_only, backing
+        self.revoked = False
+
+    def narrowed(self, narrowing: tuple[Any, ...], line: int = 0) -> Capability:
+        limit, ro = self.limit, self.read_only
+        for nw in narrowing:
+            if nw.kind == "read-only":
+                if self.effect != "files":
+                    raise SayError("E0504", line, effect=self.effect, x="read only", current="it")
+                ro = True
+                continue
+            arg = nw.arg.value if isinstance(nw.arg, C.Lit) else nw.arg
+            if self.effect not in self.NARROWABLE:
+                raise SayError("E0504", line, effect=self.effect, x=display(arg, True), current="it")
+            if self.effect == "files":
+                arg = os.path.realpath(str(arg))
+                inside = limit is None or os.path.commonpath([limit, arg]) == limit
+            elif self.effect == "tasks":
+                inside = limit is None or arg <= limit
+            else:
+                inside = limit is None or limit == arg
+            if not inside:
+                raise SayError("E0504", line, effect=self.effect, x=display(arg, True), current=display(limit, True))
+            limit = arg
+        cap = Capability(self.effect, limit, ro, self.backing)
+        cap.parent = self  # type: ignore[attr-defined]
+        return cap
+
+    def check(self, use: Any = None) -> Problem | None:
+        """Panic if revoked; ask the backing (if any). A non-ok answer is a problem value."""
+        cap: Any = self
+        while cap is not None:
+            if cap.revoked:
+                raise panic("E0502", effect=self.effect, reason="it was revoked at the end of a `with` block")
+            cap = getattr(cap, "parent", None)
+        if self.backing is not None:
+            status = self.backing.check(self.effect, (self.limit, self.read_only), use or {})
+            if status != "ok":
+                return Problem(Sym("capability-revoked"), f"`{self.effect}` is {status}", MapV(reason=status))
+        return None
+
+    def path(self, path: Any, write: bool) -> str:
+        real = os.path.realpath(str(path))
+        if self.limit is not None and os.path.commonpath([self.limit, real]) != self.limit:
+            raise panic("E0502", effect="files", reason=f"`{path}` is outside the `files` capability")
+        if write and self.read_only:
+            raise panic("E0502", effect="files", reason="the `files` capability is read only")
+        return real
 
 
 class ReturnSig(Exception):
@@ -172,6 +220,8 @@ class Evaluator:
         }
         self.lam_idx: dict[int, tuple[int, ...]] = {}
         self.read: Any = lambda: None
+        self.rng = random.Random()
+        self.clock: Decimal | None = None
 
     # ---- loading -------------------------------------------------------------------------
     def load(self, mod: C.Module) -> Gen:
@@ -316,6 +366,20 @@ class Evaluator:
     def e_ExprStmt(self, n: C.ExprStmt, env: Env) -> Gen:
         yield from self.ev(n.expr, env)
 
+    def e_WithCap(self, n: C.WithCap, env: Env) -> Gen:
+        effect = n.cap.name
+        parent = env.caps.get(effect)
+        if parent is None:
+            raise panic("E0502", effect=effect, reason="the enclosing function does not hold it")
+        args = []
+        for nw in n.narrowing:
+            args.append(C.Narrow(nw.kind, None if nw.arg is None else (yield from self.ev(nw.arg, env))))
+        cap = parent.narrowed(tuple(args), n.line)
+        try:
+            yield from self.block(n.body, Env(env.cells, {**env.caps, effect: cap}, env.func))
+        finally:
+            cap.revoked = True
+
     def e_Check(self, n: C.Check, env: Env) -> Gen:
         return None
         yield
@@ -441,7 +505,11 @@ class Evaluator:
         node = f.node
         caps = env.caps if f.env is None else f.env.caps
         if isinstance(node, C.Func):
-            caps = {e.effect: env.caps[e.effect] for e in node.effects if e.effect in env.caps}
+            caps = {}
+            for e in node.effects:
+                if e.effect in env.caps:
+                    c = env.caps[e.effect]
+                    caps[e.effect] = c.narrowed(e.narrowing, node.line) if e.narrowing else c
         new = Env(dict(f.env.cells) if f.env else {}, caps, f if isinstance(node, C.Func) else env.func)
         pos = iter(args)
         idx = f.idx or self.lambda_indices(f)
@@ -693,13 +761,24 @@ def prelude_module() -> C.Module:
 _PRELUDE: list[C.Module] = []
 
 
-def program(mod: C.Module, write: Any = print, read: Any = None, grant: Any = None) -> tuple[Evaluator, Any]:
+HOST_EFFECTS = {"console", "files", "clock", "random", "tasks"}
+
+
+def program(
+    mod: C.Module, write: Any = print, read: Any = None, grant: Any = None, backing: Any = None, seed: Any = None
+) -> tuple[Evaluator, Any]:
     """Load prelude and `mod`, then call `main` with the capabilities it declares that the
     host grants (spec 07 section 1.5). Returns the evaluator and main's result."""
+    from .checker import check_module
+
+    check_module(mod)
     if not _PRELUDE:
         _PRELUDE.append(prelude_module())
     ev = Evaluator(write)
     ev.read = read or (lambda: None)
+    if seed is not None:
+        ev.rng.seed(seed)
+        ev.clock = Decimal(0)
     ev.globals["empty-set"] = SetV(())
     ev.run(ev.load(_PRELUDE[0]))
     ev.run(ev.load(mod))
@@ -707,9 +786,12 @@ def program(mod: C.Module, write: Any = print, read: Any = None, grant: Any = No
     if not isinstance(main, Generic):
         return ev, None
     effects = main.methods[0].node.effects
-    caps = {}
+    caps: dict[str, Capability] = {}
     for e in effects:
-        if grant is not None and not grant(e.effect):
-            raise SayError("E0506", effect=e.effect, severity="refused")
-        caps[e.effect] = Capability(e.effect, e.narrowing)
-    return ev, ev.run(ev.apply(main, [], {}, Env(caps=caps)))
+        if e.effect not in HOST_EFFECTS or (grant is not None and not grant(e.effect)):
+            why = "not implemented in this version" if e.effect not in HOST_EFFECTS else "`--deny`"
+            params: dict[str, Any] = {"effect": e.effect, "policy source": why}
+            raise SayError("E0506", main.methods[0].node.line, **params)
+        caps[e.effect] = Capability(e.effect, backing=backing)
+    env = Env(caps=caps)
+    return ev, ev.run(ev.apply(main, [], {}, env))

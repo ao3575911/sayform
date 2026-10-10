@@ -14,7 +14,7 @@ from typing import Any
 
 from .codes import CODES
 
-_PH = re.compile(r"\{([a-z0-9_/]+)(?::[^{}]*)?\}")
+_PH = re.compile(r"\{([a-z0-9_/ ]+)(?::[^{}]*)?\}")
 EXIT = {"error": 2, "panic": 70, "refused": 4, "warning": 0}
 
 

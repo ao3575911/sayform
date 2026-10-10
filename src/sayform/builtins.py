@@ -90,16 +90,19 @@ host("display")(lambda value: display(value))
 # ---- 2.2 console -------------------------------------------------------------------------
 @host("show", gen=True, needs="console")
 def show(ev: Evaluator, env: Env, value: Any) -> Gen:
-    env.caps["console"].check()
-    ev.write(display(value))
-    return None
+    bad = env.caps["console"].check()
+    if bad is None:
+        ev.write(display(value))
+    return bad
     yield
 
 
 @host("ask", gen=True, needs="console")
 def ask(ev: Evaluator, env: Env, prompt: Any) -> Gen:
     text_arg("ask", prompt)
-    env.caps["console"].check()
+    bad = env.caps["console"].check()
+    if bad is not None:
+        return bad
     ev.write(prompt, end="")
     line = ev.read()
     return Problem(Sym("not-found"), "end of input") if line is None else line
@@ -259,3 +262,56 @@ def values(m: Any) -> tuple[Any, ...]:
     if not isinstance(m, MapV):
         raise mismatch("values", m, expected="a map")
     return tuple(m.values())
+
+
+# ---- 2.8 host-effect modules -------------------------------------------------------------
+@host("files.read-text", gen=True, needs="files")
+def read_text(ev: Evaluator, env: Env, path: Any) -> Gen:
+    text_arg("files.read-text", path)
+    cap = env.caps["files"]
+    bad = cap.check({"path": path})
+    if bad is not None:
+        return bad
+    real = cap.path(path, write=False)
+    try:
+        with open(real, encoding="utf-8") as f:
+            return f.read()
+    except OSError as e:
+        return Problem(Sym("not-found"), f"cannot read `{path}`: {e.strerror}")
+    yield
+
+
+@host("files.write-text", gen=True, needs="files")
+def write_text(ev: Evaluator, env: Env, content: Any, to: Any) -> Gen:
+    text_arg("files.write-text", content, to)
+    cap = env.caps["files"]
+    bad = cap.check({"path": to})
+    if bad is not None:
+        return bad
+    with open(cap.path(to, write=True), "w", encoding="utf-8") as f:
+        f.write(content)
+    return None
+    yield
+
+
+@host("clock.now", gen=True, needs="clock")
+def now(ev: Evaluator, env: Env) -> Gen:
+    bad = env.caps["clock"].check()
+    if bad is not None:
+        return bad
+    if ev.clock is not None:
+        return ev.clock.quantize(Decimal("0.000001"))
+    import time
+
+    return Decimal(time.time_ns() // 1000).scaleb(-6)
+    yield
+
+
+@host("random.random-integer", gen=True, needs="random")
+def random_integer(ev: Evaluator, env: Env, from_: Any, to: Any) -> Gen:
+    for x in (from_, to):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise mismatch("random-integer", x, expected="an integer")
+    bad = env.caps["random"].check()
+    return bad if bad is not None else ev.rng.randint(from_, to)
+    yield
