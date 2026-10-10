@@ -1,0 +1,24 @@
+Module derivative, edition 0.
+It may use: console.
+Function `derive`: takes e (an expression); gives an expression; may use nothing.
+L7:   Look at e:
+L8:     When it is quote (?u plus ?v):
+L9:       Give back the expression `~derive(u) + ~derive(v)`.
+L10:     When it is quote (?u times ?v):
+L11:       Give back the expression `~derive(u) * ~v + ~u * ~derive(v)`.
+L12:     Otherwise:
+L13:       If head of e equals the symbol name:
+L14:         Give back the expression `1`.
+L15:       Give back the expression `0`.
+Ruleset `tidy`:
+L19:   Rewrite <PQuote> as ?a.
+L20:   Rewrite <PQuote> as ?a.
+L21:   Rewrite <PQuote> as 0.
+L22:   Rewrite <PQuote> as 0.
+L23:   Rewrite <PQuote> as ?a.
+L24:   Rewrite <PQuote> as ?a.
+Function `main`: takes nothing; gives nothing; may use console.
+L28:   Let `p` be the expression `x * x + 3 * x`, which never changes.
+L29:   Let `d` be the result of derive given p, which never changes.
+L30:   Show d.
+L31:   Show simplify d using tidy.

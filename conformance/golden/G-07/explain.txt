@@ -1,0 +1,20 @@
+Module binary-search, edition 0.
+It may use: console.
+Function `find`: takes target (a number), xs (a list of numbers); gives an integer; may use nothing.
+L7:   Let `low` be 1, which can change later.
+L8:   Let `high` be the number of items in xs, which can change later.
+L9:   While low is at most high:
+L10:     Let `middle` be ((low plus high) divided by 2, rounded down), which never changes.
+L11:     Let `value` be item middle of xs, which never changes.
+L12:     If value equals target:
+L13:       Give back middle.
+L14:     Otherwise, if value is less than target:
+L15:       Change `low` to middle plus 1.
+L16:     Otherwise:
+L17:       Change `high` to middle minus 1.
+L18:   Give back 0.
+Function `main`: takes nothing; gives nothing; may use console.
+L22:   Let `xs` be [2, 3, 5, 7, 11, 13, 17], which never changes.
+L23:   Show the result of find given 11, xs.
+L24:   Show the result of find given 2, xs.
+L25:   Show the result of find given 4, xs.

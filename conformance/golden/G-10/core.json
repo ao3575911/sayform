@@ -1,0 +1,278 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "line-count",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   },
+   {
+    "node": "EffItem",
+    "effect": "files",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "count-lines",
+    "params": [
+     {
+      "node": "Param",
+      "name": "path",
+      "slot": "of",
+      "type": {
+       "node": "TName",
+       "ref": "text"
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "integer"
+    },
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "files",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "text",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "Try",
+        "expr": {
+         "node": "Call",
+         "fn": {
+          "node": "Name",
+          "name": "files.read-text",
+          "ref": {
+           "kind": "builtin",
+           "value": "files.read-text"
+          }
+         },
+         "args": [
+          {
+           "node": "Name",
+           "name": "path",
+           "ref": {
+            "kind": "local",
+            "value": 0
+           }
+          }
+         ],
+         "slots": []
+        }
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "count",
+         "ref": {
+          "kind": "builtin",
+          "value": "count"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "split",
+           "ref": {
+            "kind": "builtin",
+            "value": "split"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "text",
+            "ref": {
+             "kind": "local",
+             "value": 1
+            }
+           }
+          ],
+          "slots": [
+           [
+            "by",
+            {
+             "node": "Lit",
+             "kind": "text",
+             "value": "\n"
+            }
+           ]
+          ]
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     },
+     {
+      "node": "EffItem",
+      "effect": "files",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "WithCap",
+       "cap": {
+        "node": "Name",
+        "name": "files",
+        "ref": {
+         "kind": "builtin",
+         "value": "files"
+        }
+       },
+       "narrowing": [
+        {
+         "node": "Narrow",
+         "kind": "limited-to",
+         "arg": {
+          "node": "Lit",
+          "kind": "text",
+          "value": "./data"
+         }
+        },
+        {
+         "node": "Narrow",
+         "kind": "read-only",
+         "arg": null
+        }
+       ],
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "ExprStmt",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "show",
+            "ref": {
+             "kind": "builtin",
+             "value": "show"
+            }
+           },
+           "args": [
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "count-lines",
+              "ref": {
+               "kind": "def",
+               "value": "count-lines"
+              }
+             },
+             "args": [
+              {
+               "node": "Lit",
+               "kind": "text",
+               "value": "./data/lines.txt"
+              }
+             ],
+             "slots": []
+            }
+           ],
+           "slots": []
+          }
+         },
+         {
+          "node": "ExprStmt",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "show",
+            "ref": {
+             "kind": "builtin",
+             "value": "show"
+            }
+           },
+           "args": [
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "count-lines",
+              "ref": {
+               "kind": "def",
+               "value": "count-lines"
+              }
+             },
+             "args": [
+              {
+               "node": "Lit",
+               "kind": "text",
+               "value": "./secret.txt"
+              }
+             ],
+             "slots": []
+            }
+           ],
+           "slots": []
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

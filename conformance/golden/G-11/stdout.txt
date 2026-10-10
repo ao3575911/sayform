@@ -1,0 +1,5 @@
+weather ok
+rates ok
+["a ok", "b ok"]
+'not-found
+'timed-out

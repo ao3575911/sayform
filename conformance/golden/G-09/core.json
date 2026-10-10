@@ -1,0 +1,883 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "derivative",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "derive",
+    "params": [
+     {
+      "node": "Param",
+      "name": "e",
+      "slot": "of",
+      "type": {
+       "node": "TName",
+       "ref": "expression"
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "expression"
+    },
+    "effects": [],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Match",
+       "subject": {
+        "node": "Name",
+        "name": "e",
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "cases": [
+        {
+         "node": "MCase",
+         "pattern": {
+          "node": "PQuote",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "add",
+            "ref": {
+             "kind": "builtin",
+             "value": "add"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "u",
+             "ref": {
+              "kind": "patvar",
+              "value": 1
+             }
+            },
+            {
+             "node": "Name",
+             "name": "v",
+             "ref": {
+              "kind": "patvar",
+              "value": 2
+             }
+            }
+           ],
+           "slots": []
+          }
+         },
+         "guard": null,
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Quote",
+             "expr": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "add",
+               "ref": {
+                "kind": "builtin",
+                "value": "add"
+               }
+              },
+              "args": [
+               {
+                "node": "Unquote",
+                "expr": {
+                 "node": "Call",
+                 "fn": {
+                  "node": "Name",
+                  "name": "derive",
+                  "ref": {
+                   "kind": "def",
+                   "value": "derive"
+                  }
+                 },
+                 "args": [
+                  {
+                   "node": "Name",
+                   "name": "u",
+                   "ref": {
+                    "kind": "local",
+                    "value": 1
+                   }
+                  }
+                 ],
+                 "slots": []
+                }
+               },
+               {
+                "node": "Unquote",
+                "expr": {
+                 "node": "Call",
+                 "fn": {
+                  "node": "Name",
+                  "name": "derive",
+                  "ref": {
+                   "kind": "def",
+                   "value": "derive"
+                  }
+                 },
+                 "args": [
+                  {
+                   "node": "Name",
+                   "name": "v",
+                   "ref": {
+                    "kind": "local",
+                    "value": 2
+                   }
+                  }
+                 ],
+                 "slots": []
+                }
+               }
+              ],
+              "slots": []
+             }
+            }
+           }
+          ]
+         }
+        },
+        {
+         "node": "MCase",
+         "pattern": {
+          "node": "PQuote",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "u",
+             "ref": {
+              "kind": "patvar",
+              "value": 3
+             }
+            },
+            {
+             "node": "Name",
+             "name": "v",
+             "ref": {
+              "kind": "patvar",
+              "value": 4
+             }
+            }
+           ],
+           "slots": []
+          }
+         },
+         "guard": null,
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Quote",
+             "expr": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "add",
+               "ref": {
+                "kind": "builtin",
+                "value": "add"
+               }
+              },
+              "args": [
+               {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "multiply",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "multiply"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Unquote",
+                  "expr": {
+                   "node": "Call",
+                   "fn": {
+                    "node": "Name",
+                    "name": "derive",
+                    "ref": {
+                     "kind": "def",
+                     "value": "derive"
+                    }
+                   },
+                   "args": [
+                    {
+                     "node": "Name",
+                     "name": "u",
+                     "ref": {
+                      "kind": "local",
+                      "value": 3
+                     }
+                    }
+                   ],
+                   "slots": []
+                  }
+                 },
+                 {
+                  "node": "Unquote",
+                  "expr": {
+                   "node": "Name",
+                   "name": "v",
+                   "ref": {
+                    "kind": "local",
+                    "value": 4
+                   }
+                  }
+                 }
+                ],
+                "slots": []
+               },
+               {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "multiply",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "multiply"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Unquote",
+                  "expr": {
+                   "node": "Name",
+                   "name": "u",
+                   "ref": {
+                    "kind": "local",
+                    "value": 3
+                   }
+                  }
+                 },
+                 {
+                  "node": "Unquote",
+                  "expr": {
+                   "node": "Call",
+                   "fn": {
+                    "node": "Name",
+                    "name": "derive",
+                    "ref": {
+                     "kind": "def",
+                     "value": "derive"
+                    }
+                   },
+                   "args": [
+                    {
+                     "node": "Name",
+                     "name": "v",
+                     "ref": {
+                      "kind": "local",
+                      "value": 4
+                     }
+                    }
+                   ],
+                   "slots": []
+                  }
+                 }
+                ],
+                "slots": []
+               }
+              ],
+              "slots": []
+             }
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "else": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "If",
+          "branches": [
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "equal",
+              "ref": {
+               "kind": "builtin",
+               "value": "equal"
+              }
+             },
+             "args": [
+              {
+               "node": "Call",
+               "fn": {
+                "node": "Name",
+                "name": "head",
+                "ref": {
+                 "kind": "builtin",
+                 "value": "head"
+                }
+               },
+               "args": [
+                {
+                 "node": "Name",
+                 "name": "e",
+                 "ref": {
+                  "kind": "local",
+                  "value": 0
+                 }
+                }
+               ],
+               "slots": []
+              },
+              {
+               "node": "SymLit",
+               "name": "name"
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "Return",
+               "value": {
+                "node": "Quote",
+                "expr": {
+                 "node": "Lit",
+                 "kind": "integer",
+                 "value": 1
+                }
+               }
+              }
+             ]
+            }
+           }
+          ],
+          "else": null
+         },
+         {
+          "node": "Return",
+          "value": {
+           "node": "Quote",
+           "expr": {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 0
+           }
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Ruleset",
+    "name": "tidy",
+    "rules": [
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Lit",
+       "kind": "integer",
+       "value": 0
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         },
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Lit",
+       "kind": "integer",
+       "value": 0
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "add",
+         "ref": {
+          "kind": "builtin",
+          "value": "add"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "add",
+         "ref": {
+          "kind": "builtin",
+          "value": "add"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         },
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     }
+    ]
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "p",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "Quote",
+        "expr": {
+         "node": "Call",
+         "fn": {
+          "node": "Name",
+          "name": "add",
+          "ref": {
+           "kind": "builtin",
+           "value": "add"
+          }
+         },
+         "args": [
+          {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "x",
+             "ref": {
+              "kind": "free",
+              "value": "x"
+             }
+            },
+            {
+             "node": "Name",
+             "name": "x",
+             "ref": {
+              "kind": "free",
+              "value": "x"
+             }
+            }
+           ],
+           "slots": []
+          },
+          {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 3
+            },
+            {
+             "node": "Name",
+             "name": "x",
+             "ref": {
+              "kind": "free",
+              "value": "x"
+             }
+            }
+           ],
+           "slots": []
+          }
+         ],
+         "slots": []
+        }
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "d",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "derive",
+         "ref": {
+          "kind": "def",
+          "value": "derive"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "p",
+          "ref": {
+           "kind": "local",
+           "value": 0
+          }
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "d",
+          "ref": {
+           "kind": "local",
+           "value": 1
+          }
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "egraph-simplify",
+           "ref": {
+            "kind": "builtin",
+            "value": "egraph-simplify"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "d",
+            "ref": {
+             "kind": "local",
+             "value": 1
+            }
+           },
+           {
+            "node": "Name",
+            "name": "tidy",
+            "ref": {
+             "kind": "def",
+             "value": "tidy"
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

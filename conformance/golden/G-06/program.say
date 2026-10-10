@@ -1,0 +1,15 @@
+module fizzbuzz
+edition 0
+needs console
+
+
+to main, needs console:
+    for each n in from 1 to 15:
+        if n mod 15 equals 0:
+            show "FizzBuzz"
+        otherwise if n mod 3 equals 0:
+            show "Fizz"
+        otherwise if n mod 5 equals 0:
+            show "Buzz"
+        otherwise:
+            show n

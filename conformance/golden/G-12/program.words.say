@@ -1,0 +1,18 @@
+module pipeline
+edition 0
+needs console and tasks
+
+
+to produce into ch, needs tasks:
+    for each n in from 1 to 4:
+        send (n times n) into ch
+    close ch
+
+
+to main, needs console and tasks:
+    let ch be new-channel with capacity 2
+    together:
+        produce into ch
+        for each x received from ch:
+            show "got {x}"
+    show "done"

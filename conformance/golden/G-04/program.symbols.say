@@ -1,0 +1,23 @@
+module shapes
+edition 0
+needs console
+
+
+variant Shape:
+    circle(radius: Number)
+    rectangle(width: Number, height: Number)
+
+
+def area(of s: Shape) -> Number:
+    match s:
+        case circle(radius=?r):
+            return 3 * r * r
+        case rectangle(width=?w, height=?h) if w = h:
+            return w * w
+        case rectangle(width=?w, height=?h):
+            return w * h
+
+
+def main() needs console:
+    for s in [circle(radius=2), rectangle(width=3, height=3), rectangle(width=2, height=5)]:
+        show(area(s))

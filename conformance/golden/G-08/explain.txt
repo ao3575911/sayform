@@ -1,0 +1,11 @@
+Module algebra-demo, edition 0.
+It may use: console.
+Ruleset `algebra`:
+L7:   Rewrite <PQuote> as ?a.
+L8:   Rewrite <PQuote> as ?a.
+L9:   Rewrite <PQuote> as 0.
+Function `main`: takes nothing; gives nothing; may use console.
+L13:   Let `e` be the expression `x * (y + 0) * 1`, which never changes.
+L14:   Show simplify e using algebra.
+L15:   Let `proven` be quote (x plus 0) is equivalent to quote (x) using algebra, which never changes.
+L16:   Show proven.

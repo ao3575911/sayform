@@ -1,0 +1,14 @@
+module line-count
+edition 0
+needs console, files
+
+
+def count_lines(of path: Text) -> Integer needs files fails not_found:
+    let text = files.read_text(path)?
+    return count(split(text, by="\n"))
+
+
+def main() needs console, files fails not_found:
+    with files limited to "./data", read only:
+        show(count_lines("./data/lines.txt"))
+        show(count_lines("./secret.txt"))

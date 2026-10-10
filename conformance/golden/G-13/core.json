@@ -1,0 +1,372 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "vectors",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "RecordDef",
+    "name": "Vector",
+    "plural": "vectors",
+    "tparams": [],
+    "fields": [
+     {
+      "node": "FieldDef",
+      "name": "x",
+      "type": {
+       "node": "TName",
+       "ref": "number"
+      },
+      "default": null
+     },
+     {
+      "node": "FieldDef",
+      "name": "y",
+      "type": {
+       "node": "TName",
+       "ref": "number"
+      },
+      "default": null
+     }
+    ],
+    "invariants": [],
+    "changeable": false
+   },
+   {
+    "node": "Func",
+    "name": "add",
+    "params": [
+     {
+      "node": "Param",
+      "name": "u",
+      "slot": null,
+      "type": {
+       "node": "TName",
+       "ref": "Vector"
+      },
+      "default": null
+     },
+     {
+      "node": "Param",
+      "name": "v",
+      "slot": null,
+      "type": {
+       "node": "TName",
+       "ref": "Vector"
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "Vector"
+    },
+    "effects": [],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Return",
+       "value": {
+        "node": "RecordLit",
+        "type": {
+         "node": "TName",
+         "ref": "Vector"
+        },
+        "fields": [
+         [
+          "x",
+          {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "add",
+            "ref": {
+             "kind": "builtin",
+             "value": "add"
+            }
+           },
+           "args": [
+            {
+             "node": "Get",
+             "target": {
+              "node": "Name",
+              "name": "u",
+              "ref": {
+               "kind": "local",
+               "value": 0
+              }
+             },
+             "field": "x",
+             "optional": false
+            },
+            {
+             "node": "Get",
+             "target": {
+              "node": "Name",
+              "name": "v",
+              "ref": {
+               "kind": "local",
+               "value": 1
+              }
+             },
+             "field": "x",
+             "optional": false
+            }
+           ],
+           "slots": []
+          }
+         ],
+         [
+          "y",
+          {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "add",
+            "ref": {
+             "kind": "builtin",
+             "value": "add"
+            }
+           },
+           "args": [
+            {
+             "node": "Get",
+             "target": {
+              "node": "Name",
+              "name": "u",
+              "ref": {
+               "kind": "local",
+               "value": 0
+              }
+             },
+             "field": "y",
+             "optional": false
+            },
+            {
+             "node": "Get",
+             "target": {
+              "node": "Name",
+              "name": "v",
+              "ref": {
+               "kind": "local",
+               "value": 1
+              }
+             },
+             "field": "y",
+             "optional": false
+            }
+           ],
+           "slots": []
+          }
+         ]
+        ],
+        "base": null
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "v",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "RecordLit",
+        "type": {
+         "node": "TName",
+         "ref": "Vector"
+        },
+        "fields": [
+         [
+          "x",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 1
+          }
+         ],
+         [
+          "y",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 2
+          }
+         ]
+        ],
+        "base": null
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "w",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "RecordLit",
+        "type": {
+         "node": "TName",
+         "ref": "Vector"
+        },
+        "fields": [
+         [
+          "x",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 3
+          }
+         ],
+         [
+          "y",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 4
+          }
+         ]
+        ],
+        "base": null
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "add",
+           "ref": {
+            "kind": "builtin",
+            "value": "add"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "v",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           },
+           {
+            "node": "Name",
+            "name": "w",
+            "ref": {
+             "kind": "local",
+             "value": 1
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "add",
+           "ref": {
+            "kind": "builtin",
+            "value": "add"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

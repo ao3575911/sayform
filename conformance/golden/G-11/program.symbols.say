@@ -1,0 +1,37 @@
+module fan-out
+edition 0
+needs console, tasks
+
+
+def fetch(name: Text, d) -> Text needs tasks fails not_found:
+    sleep(for=d)
+    if name = "missing":
+        return problem not-found
+    return "{name} ok"
+
+
+def gather(of names: List[Text]) -> List[Text] needs tasks fails not_found, several, timed_out:
+    within 5s:
+        return map_concurrent(names, n => fetch(n, 1s))
+    return []
+
+
+def race() -> List[Text] needs tasks fails not_found, several, timed_out:
+    within 3s:
+        return all_of:
+            fetch("slow", 1min)
+            fetch("fast", 1s)
+    return []
+
+
+def main() needs console, tasks fails not_found, several, timed_out:
+    let parts = all_of:
+        weather: fetch("weather", 2s)
+        rates: fetch("rates", 1s)
+    show(parts.weather)
+    show(parts.rates)
+    show(gather(["a", "b"]))
+    let one = gather(["a", "missing"])
+    show(one.kind)
+    let late = race()
+    show(late.kind)

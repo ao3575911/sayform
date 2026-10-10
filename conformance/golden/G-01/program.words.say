@@ -1,0 +1,7 @@
+module hello
+edition 0
+needs console
+
+
+to main, needs console:
+    show "Hello, world"

@@ -1,0 +1,380 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "word-frequency",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "words",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "split",
+         "ref": {
+          "kind": "builtin",
+          "value": "split"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "text",
+          "value": "the cat and the hat and the bat"
+         }
+        ],
+        "slots": [
+         [
+          "by",
+          {
+           "node": "Lit",
+           "kind": "text",
+           "value": " "
+          }
+         ]
+        ]
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "groups",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 2
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "group-by",
+         "ref": {
+          "kind": "builtin",
+          "value": "group-by"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "words",
+          "ref": {
+           "kind": "local",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Name",
+           "name": "it",
+           "ref": {
+            "kind": "local",
+            "value": 1
+           }
+          }
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "counts",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 4
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "map",
+         "ref": {
+          "kind": "builtin",
+          "value": "map"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "keys",
+           "ref": {
+            "kind": "builtin",
+            "value": "keys"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "groups",
+            "ref": {
+             "kind": "local",
+             "value": 2
+            }
+           }
+          ],
+          "slots": []
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Name",
+             "name": "it",
+             "ref": {
+              "kind": "local",
+              "value": 3
+             }
+            },
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "count",
+              "ref": {
+               "kind": "builtin",
+               "value": "count"
+              }
+             },
+             "args": [
+              {
+               "node": "Index",
+               "target": {
+                "node": "Name",
+                "name": "groups",
+                "ref": {
+                 "kind": "local",
+                 "value": 2
+                }
+               },
+               "index": {
+                "node": "Name",
+                "name": "it",
+                "ref": {
+                 "kind": "local",
+                 "value": 3
+                }
+               },
+               "optional": false
+              }
+             ],
+             "slots": []
+            }
+           ]
+          }
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "For",
+       "binder": {
+        "node": "PBind",
+        "name": "pair",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 6
+        }
+       },
+       "source": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sort-by",
+         "ref": {
+          "kind": "builtin",
+          "value": "sort-by"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "counts",
+          "ref": {
+           "kind": "local",
+           "value": 4
+          }
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Index",
+           "target": {
+            "node": "Name",
+            "name": "it",
+            "ref": {
+             "kind": "local",
+             "value": 5
+            }
+           },
+           "index": {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           "optional": false
+          }
+         }
+        ],
+        "slots": [
+         [
+          "descending",
+          {
+           "node": "Lit",
+           "kind": "truth",
+           "value": true
+          }
+         ]
+        ]
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "ExprStmt",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "show",
+            "ref": {
+             "kind": "builtin",
+             "value": "show"
+            }
+           },
+           "args": [
+            {
+             "node": "Interp",
+             "parts": [
+              {
+               "node": "Index",
+               "target": {
+                "node": "Name",
+                "name": "pair",
+                "ref": {
+                 "kind": "local",
+                 "value": 6
+                }
+               },
+               "index": {
+                "node": "Lit",
+                "kind": "integer",
+                "value": 1
+               },
+               "optional": false
+              },
+              ": ",
+              {
+               "node": "Index",
+               "target": {
+                "node": "Name",
+                "name": "pair",
+                "ref": {
+                 "kind": "local",
+                 "value": 6
+                }
+               },
+               "index": {
+                "node": "Lit",
+                "kind": "integer",
+                "value": 2
+               },
+               "optional": false
+              }
+             ]
+            }
+           ],
+           "slots": []
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,444 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "average",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "average",
+    "params": [
+     {
+      "node": "Param",
+      "name": "numbers",
+      "slot": "of",
+      "type": {
+       "node": "TApply",
+       "head": "list",
+       "args": [
+        {
+         "node": "TName",
+         "ref": "number"
+        }
+       ]
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "number"
+    },
+    "effects": [],
+    "fails": [
+     "empty-list"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "If",
+       "branches": [
+        {
+         "node": "Branch",
+         "cond": {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "is-empty",
+           "ref": {
+            "kind": "builtin",
+            "value": "is-empty"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "numbers",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         },
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "problem",
+              "ref": {
+               "kind": "builtin",
+               "value": "problem"
+              }
+             },
+             "args": [
+              {
+               "node": "SymLit",
+               "name": "empty-list"
+              }
+             ],
+             "slots": []
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "else": null
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "divide",
+         "ref": {
+          "kind": "builtin",
+          "value": "divide"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "sum",
+           "ref": {
+            "kind": "builtin",
+            "value": "sum"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "numbers",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         },
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "count",
+           "ref": {
+            "kind": "builtin",
+            "value": "count"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "numbers",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "report",
+    "params": [
+     {
+      "node": "Param",
+      "name": "numbers",
+      "slot": "of",
+      "type": {
+       "node": "TApply",
+       "head": "list",
+       "args": [
+        {
+         "node": "TName",
+         "ref": "number"
+        }
+       ]
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "text"
+    },
+    "effects": [],
+    "fails": [
+     "empty-list"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "mean",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "Try",
+        "expr": {
+         "node": "Call",
+         "fn": {
+          "node": "Name",
+          "name": "average",
+          "ref": {
+           "kind": "def",
+           "value": "average"
+          }
+         },
+         "args": [
+          {
+           "node": "Name",
+           "name": "numbers",
+           "ref": {
+            "kind": "local",
+            "value": 0
+           }
+          }
+         ],
+         "slots": []
+        }
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "Interp",
+        "parts": [
+         "mean ",
+         {
+          "node": "Name",
+          "name": "mean",
+          "ref": {
+           "kind": "local",
+           "value": 1
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "average",
+           "ref": {
+            "kind": "def",
+            "value": "average"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 2
+             },
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 4
+             },
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 9
+             }
+            ]
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "report",
+           "ref": {
+            "kind": "def",
+            "value": "report"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 1
+             },
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 2
+             }
+            ]
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "missing",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "report",
+         "ref": {
+          "kind": "def",
+          "value": "report"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Get",
+          "target": {
+           "node": "Name",
+           "name": "missing",
+           "ref": {
+            "kind": "local",
+            "value": 0
+           }
+          },
+          "field": "kind",
+          "optional": false
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

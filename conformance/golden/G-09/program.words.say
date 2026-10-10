@@ -1,0 +1,31 @@
+module derivative
+edition 0
+needs console
+
+
+to derive of e (an expression) giving an expression:
+    match e:
+        when quote (?u plus ?v):
+            give back quote (~(derive of u) plus ~(derive of v))
+        when quote (?u times ?v):
+            give back quote (~(derive of u) times ~v plus ~u times ~(derive of v))
+        otherwise:
+            if head of e equals the symbol name:
+                give back quote (1)
+            give back quote (0)
+
+
+ruleset tidy:
+    rewrite ?a times 1 as ?a
+    rewrite 1 times ?a as ?a
+    rewrite ?a times 0 as 0
+    rewrite 0 times ?a as 0
+    rewrite ?a plus 0 as ?a
+    rewrite 0 plus ?a as ?a
+
+
+to main, needs console:
+    let p be quote (x times x plus 3 times x)
+    let d be derive of p
+    show d
+    show simplify d using tidy

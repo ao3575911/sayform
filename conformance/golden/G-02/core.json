@@ -1,0 +1,300 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "gst",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "gst",
+    "params": [
+     {
+      "node": "Param",
+      "name": "price",
+      "slot": "of",
+      "type": {
+       "node": "TName",
+       "ref": "decimal"
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "decimal"
+    },
+    "effects": [],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Return",
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "price",
+          "ref": {
+           "kind": "local",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "decimal",
+          "value": "0.10"
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "prices",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "decimal",
+          "value": "12.50"
+         },
+         {
+          "node": "Lit",
+          "kind": "decimal",
+          "value": "3.20"
+         },
+         {
+          "node": "Lit",
+          "kind": "decimal",
+          "value": "0.99"
+         }
+        ]
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "total-gst",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 2
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sum",
+         "ref": {
+          "kind": "builtin",
+          "value": "sum"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "map",
+           "ref": {
+            "kind": "builtin",
+            "value": "map"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "prices",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           },
+           {
+            "node": "Lambda",
+            "params": [
+             {
+              "node": "Param",
+              "name": "it",
+              "slot": null,
+              "type": null,
+              "default": null
+             }
+            ],
+            "body": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "gst",
+              "ref": {
+               "kind": "def",
+               "value": "gst"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "it",
+               "ref": {
+                "kind": "local",
+                "value": 1
+               }
+              }
+             ],
+             "slots": []
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Interp",
+          "parts": [
+           "GST: ",
+           {
+            "node": "Name",
+            "name": "total-gst",
+            "ref": {
+             "kind": "local",
+             "value": 2
+            }
+           }
+          ]
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Interp",
+          "parts": [
+           "Rounded: ",
+           {
+            "node": "Call",
+            "fn": {
+             "node": "Name",
+             "name": "round",
+             "ref": {
+              "kind": "builtin",
+              "value": "round"
+             }
+            },
+            "args": [
+             {
+              "node": "Name",
+              "name": "total-gst",
+              "ref": {
+               "kind": "local",
+               "value": 2
+              }
+             }
+            ],
+            "slots": [
+             [
+              "places",
+              {
+               "node": "Lit",
+               "kind": "integer",
+               "value": 2
+              }
+             ]
+            ]
+           }
+          ]
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

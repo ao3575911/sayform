@@ -1,0 +1,4 @@
+Module hello, edition 0.
+It may use: console.
+Function `main`: takes nothing; gives nothing; may use console.
+L7:   Show the text "Hello, world".

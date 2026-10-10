@@ -1,0 +1,9 @@
+Module gst, edition 0.
+It may use: console.
+Function `gst`: takes price (a decimal); gives a decimal; may use nothing.
+L9:   Give back price times 0.10.
+Function `main`: takes nothing; gives nothing; may use console.
+L13:   Let `prices` be [12.50, 3.20, 0.99], which never changes.
+L14:   Let `total-gst` be sum of (prices each gst of it), which never changes.
+L15:   Show the text "GST: {total-gst}".
+L16:   Show the text "Rounded: {round total-gst with places 2}".

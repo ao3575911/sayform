@@ -1,0 +1,28 @@
+Module fan-out, edition 0.
+It may use: console and tasks.
+Function `fetch`: takes name (text), d; gives text; may use tasks; may fail with not-found.
+L7:   Sleep for d.
+L8:   If name equals "missing":
+L9:     Give back problem not-found.
+L10:   Give back the text "{name} ok".
+Function `gather`: takes names (a list of text); gives a list of text; may use tasks; may fail with not-found and several and timed-out.
+L14:   Within 5 seconds, otherwise fail with timed-out:
+L15:     Give back each n in names at the same time, fetch(n, 1 second).
+L16:   Give back [].
+Function `race`: takes nothing; gives a list of text; may use tasks; may fail with not-found and several and timed-out.
+L20:   Within 3 seconds, otherwise fail with timed-out:
+L21:     Give back the results of these, run at the same time:
+L22:       (a) the result of fetch given "slow", 1 minute.
+L23:       (b) the result of fetch given "fast", 1 second.
+L24:   Give back [].
+Function `main`: takes nothing; gives nothing; may use console and tasks; may fail with not-found and several and timed-out.
+L28:   Let `parts` be the results of these, run at the same time:
+L29:     (a) weather: the result of fetch given "weather", 2 seconds.
+L30:     (b) rates: the result of fetch given "rates", 1 second.
+L31:   Show parts's weather.
+L32:   Show parts's rates.
+L33:   Show the result of gather given ["a", "b"].
+L34:   Let `one` be the result of gather given ["a", "missing"], which never changes.
+L35:   Show one's kind.
+L36:   Let `late` be the result of race, which never changes.
+L37:   Show late's kind.

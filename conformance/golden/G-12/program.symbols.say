@@ -1,0 +1,18 @@
+module pipeline
+edition 0
+needs console, tasks
+
+
+def produce(into ch) needs tasks:
+    for n in 1..4:
+        send(n * n, into=ch)
+    close(ch)
+
+
+def main() needs console, tasks:
+    let ch = new_channel(capacity=2)
+    together:
+        produce(into=ch)
+        for x in received(ch):
+            show("got {x}")
+    show("done")

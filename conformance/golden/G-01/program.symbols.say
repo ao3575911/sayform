@@ -1,0 +1,7 @@
+module hello
+edition 0
+needs console
+
+
+def main() needs console:
+    show("Hello, world")

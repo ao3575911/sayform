@@ -1,0 +1,24 @@
+module average
+edition 0
+needs console
+
+
+note: The mean of a list of numbers.
+    example: average of [1, 2, 3] gives 2
+    example: average of [] fails with empty-list
+to average of numbers (a list of numbers) giving a number, may fail with empty-list:
+    if numbers is empty:
+        give back problem empty-list
+    give back (sum of numbers) divided by count of numbers
+
+
+to report of numbers (a list of numbers) giving text, may fail with empty-list:
+    let mean be try average of numbers
+    give back "mean {mean}"
+
+
+to main, needs console:
+    show average of [2, 4, 9]
+    show report of [1, 2]
+    let missing be report of []
+    show missing's kind

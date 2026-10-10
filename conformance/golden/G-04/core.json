@@ -1,0 +1,514 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "shapes",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "VariantDef",
+    "name": "Shape",
+    "plural": "shapes",
+    "tparams": [],
+    "cases": [
+     {
+      "node": "CaseDef",
+      "name": "circle",
+      "fields": [
+       {
+        "node": "FieldDef",
+        "name": "radius",
+        "type": {
+         "node": "TName",
+         "ref": "number"
+        },
+        "default": null
+       }
+      ]
+     },
+     {
+      "node": "CaseDef",
+      "name": "rectangle",
+      "fields": [
+       {
+        "node": "FieldDef",
+        "name": "width",
+        "type": {
+         "node": "TName",
+         "ref": "number"
+        },
+        "default": null
+       },
+       {
+        "node": "FieldDef",
+        "name": "height",
+        "type": {
+         "node": "TName",
+         "ref": "number"
+        },
+        "default": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "node": "Func",
+    "name": "area",
+    "params": [
+     {
+      "node": "Param",
+      "name": "s",
+      "slot": "of",
+      "type": {
+       "node": "TName",
+       "ref": "Shape"
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "number"
+    },
+    "effects": [],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Match",
+       "subject": {
+        "node": "Name",
+        "name": "s",
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "cases": [
+        {
+         "node": "MCase",
+         "pattern": {
+          "node": "PCase",
+          "case": "circle",
+          "fields": [
+           [
+            "radius",
+            {
+             "node": "PBind",
+             "name": "r",
+             "type": null,
+             "ref": {
+              "kind": "local",
+              "value": 1
+             }
+            }
+           ]
+          ],
+          "open": false
+         },
+         "guard": null,
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "multiply",
+              "ref": {
+               "kind": "builtin",
+               "value": "multiply"
+              }
+             },
+             "args": [
+              {
+               "node": "Call",
+               "fn": {
+                "node": "Name",
+                "name": "multiply",
+                "ref": {
+                 "kind": "builtin",
+                 "value": "multiply"
+                }
+               },
+               "args": [
+                {
+                 "node": "Lit",
+                 "kind": "integer",
+                 "value": 3
+                },
+                {
+                 "node": "Name",
+                 "name": "r",
+                 "ref": {
+                  "kind": "local",
+                  "value": 1
+                 }
+                }
+               ],
+               "slots": []
+              },
+              {
+               "node": "Name",
+               "name": "r",
+               "ref": {
+                "kind": "local",
+                "value": 1
+               }
+              }
+             ],
+             "slots": []
+            }
+           }
+          ]
+         }
+        },
+        {
+         "node": "MCase",
+         "pattern": {
+          "node": "PCase",
+          "case": "rectangle",
+          "fields": [
+           [
+            "width",
+            {
+             "node": "PBind",
+             "name": "w",
+             "type": null,
+             "ref": {
+              "kind": "local",
+              "value": 2
+             }
+            }
+           ],
+           [
+            "height",
+            {
+             "node": "PBind",
+             "name": "h",
+             "type": null,
+             "ref": {
+              "kind": "local",
+              "value": 3
+             }
+            }
+           ]
+          ],
+          "open": false
+         },
+         "guard": {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "equal",
+           "ref": {
+            "kind": "builtin",
+            "value": "equal"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "w",
+            "ref": {
+             "kind": "local",
+             "value": 2
+            }
+           },
+           {
+            "node": "Name",
+            "name": "h",
+            "ref": {
+             "kind": "local",
+             "value": 3
+            }
+           }
+          ],
+          "slots": []
+         },
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "multiply",
+              "ref": {
+               "kind": "builtin",
+               "value": "multiply"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "w",
+               "ref": {
+                "kind": "local",
+                "value": 2
+               }
+              },
+              {
+               "node": "Name",
+               "name": "w",
+               "ref": {
+                "kind": "local",
+                "value": 2
+               }
+              }
+             ],
+             "slots": []
+            }
+           }
+          ]
+         }
+        },
+        {
+         "node": "MCase",
+         "pattern": {
+          "node": "PCase",
+          "case": "rectangle",
+          "fields": [
+           [
+            "width",
+            {
+             "node": "PBind",
+             "name": "w",
+             "type": null,
+             "ref": {
+              "kind": "local",
+              "value": 4
+             }
+            }
+           ],
+           [
+            "height",
+            {
+             "node": "PBind",
+             "name": "h",
+             "type": null,
+             "ref": {
+              "kind": "local",
+              "value": 5
+             }
+            }
+           ]
+          ],
+          "open": false
+         },
+         "guard": null,
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "multiply",
+              "ref": {
+               "kind": "builtin",
+               "value": "multiply"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "w",
+               "ref": {
+                "kind": "local",
+                "value": 4
+               }
+              },
+              {
+               "node": "Name",
+               "name": "h",
+               "ref": {
+                "kind": "local",
+                "value": 5
+               }
+              }
+             ],
+             "slots": []
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "else": null
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "For",
+       "binder": {
+        "node": "PBind",
+        "name": "s",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "source": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "RecordLit",
+          "type": {
+           "node": "TName",
+           "ref": "circle"
+          },
+          "fields": [
+           [
+            "radius",
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            }
+           ]
+          ],
+          "base": null
+         },
+         {
+          "node": "RecordLit",
+          "type": {
+           "node": "TName",
+           "ref": "rectangle"
+          },
+          "fields": [
+           [
+            "width",
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 3
+            }
+           ],
+           [
+            "height",
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 3
+            }
+           ]
+          ],
+          "base": null
+         },
+         {
+          "node": "RecordLit",
+          "type": {
+           "node": "TName",
+           "ref": "rectangle"
+          },
+          "fields": [
+           [
+            "width",
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            }
+           ],
+           [
+            "height",
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 5
+            }
+           ]
+          ],
+          "base": null
+         }
+        ]
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "ExprStmt",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "show",
+            "ref": {
+             "kind": "builtin",
+             "value": "show"
+            }
+           },
+           "args": [
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "area",
+              "ref": {
+               "kind": "def",
+               "value": "area"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "s",
+               "ref": {
+                "kind": "local",
+                "value": 0
+               }
+              }
+             ],
+             "slots": []
+            }
+           ],
+           "slots": []
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

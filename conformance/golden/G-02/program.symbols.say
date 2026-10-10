@@ -1,0 +1,16 @@
+module gst
+edition 0
+needs console
+
+
+note: Australian GST is 10% of the GST-exclusive price.
+    example: gst of 12.50 gives 1.25
+def gst(of price: Decimal) -> Decimal:
+    return price * 0.10
+
+
+def main() needs console:
+    let prices = [12.50, 3.20, 0.99]
+    let total_gst = sum(map(prices, it => gst(it)))
+    show("GST: {total_gst}")
+    show("Rounded: {round(total_gst, places=2)}")

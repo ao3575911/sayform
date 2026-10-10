@@ -6,7 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-10-10
+
 ### Added
+- M11: golden programs G-01…G-14 in `conformance/golden/` (program, canonical words and
+  symbols, explain, core JSON, hash, stdout, expect.toml) checked byte-exact by
+  `tests/test_conformance.py`; README 60-second demo; `examples/party.say` (two agents spread
+  a party invite over a channel); release workflow with a CI-signed tag, SHA256SUMS and a build
+  provenance attestation. Explain now says "the text …" for text literals and interpolations
+  (G-01 normative).
 - M10: modules and the `strict` dialect. `modules.py` finds `use a.b` at `a/b.say` under the
   package root (`say.toml` directory, else the file's directory), loads dependencies first,
   reports missing modules, path mismatches and cycles (with the cycle printed) as SAY-E0701,

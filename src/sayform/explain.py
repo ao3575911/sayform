@@ -46,8 +46,10 @@ class Explainer:
             if n.fn.ref.kind == "builtin" and name == "show" and len(a) == 1:
                 return f"show {self.np(a[0], d)}"
             if n.fn.ref.kind == "def":
-                args = [self.np(x, d) for x in a] + [f"{k} {self.np(v, d)}" for k, v in n.slots]
+                args = [self.arg(x, d) for x in a] + [f"{k} {self.arg(v, d)}" for k, v in n.slots]
                 return f"the result of {name}" + (" given " + ", ".join(args) if args else "")
+        if isinstance(n, C.Interp) or isinstance(n, C.Lit) and n.kind == "text":
+            return f"the text {self.p.ex(n)}"
         if isinstance(n, C.Try):
             return f"{self.np(n.expr, d)}, stopping here and passing on any problem"
         if isinstance(n, C.Lambda):
@@ -58,6 +60,9 @@ class Explainer:
         if isinstance(n, C.Concurrent):
             return WHAT.get(n.mode, WHO[n.mode].lower())
         return self.p.ex(n)
+
+    def arg(self, n: Any, depth: int) -> str:
+        return self.p.ex(n) if isinstance(n, C.Lit) else self.np(n, depth)
 
     def say(self, line: int, level: int, text: str) -> None:
         text = text[:1].upper() + text[1:]
@@ -127,7 +132,11 @@ class Explainer:
             what = "nothing" if s.value is None else self.np(s.value)
             self.say(s.line, level, f"{tag}give back {what}{':' if conc else ''}")
         elif isinstance(s, C.WithCap):
-            self.say(s.line, level, f"{tag}using only {self.p.effects((C.EffItem(s.cap, s.narrowing),))}:")
+            self.say(
+                s.line,
+                level,
+                f"{tag}using only {self.p.effects((C.EffItem(getattr(s.cap, 'name', s.cap), s.narrowing),))}:",
+            )
             self.block(s.body, level + 1)
         elif isinstance(s, C.Concurrent):
             self.say(s.line, level, f"{tag}{WHO[s.mode]}:")

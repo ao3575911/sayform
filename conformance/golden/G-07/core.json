@@ -1,0 +1,640 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "binary-search",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "find",
+    "params": [
+     {
+      "node": "Param",
+      "name": "target",
+      "slot": null,
+      "type": {
+       "node": "TName",
+       "ref": "number"
+      },
+      "default": null
+     },
+     {
+      "node": "Param",
+      "name": "xs",
+      "slot": null,
+      "type": {
+       "node": "TApply",
+       "head": "list",
+       "args": [
+        {
+         "node": "TName",
+         "ref": "number"
+        }
+       ]
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "integer"
+    },
+    "effects": [],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "low",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 2
+        }
+       },
+       "value": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 1
+       },
+       "mutable": true,
+       "type": null
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "high",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 3
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "count",
+         "ref": {
+          "kind": "builtin",
+          "value": "count"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "xs",
+          "ref": {
+           "kind": "local",
+           "value": 1
+          }
+         }
+        ],
+        "slots": []
+       },
+       "mutable": true,
+       "type": null
+      },
+      {
+       "node": "While",
+       "cond": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "less-eq",
+         "ref": {
+          "kind": "builtin",
+          "value": "less-eq"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "low",
+          "ref": {
+           "kind": "local",
+           "value": 2
+          }
+         },
+         {
+          "node": "Name",
+          "name": "high",
+          "ref": {
+           "kind": "local",
+           "value": 3
+          }
+         }
+        ],
+        "slots": []
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "Bind",
+          "target": {
+           "node": "PBind",
+           "name": "middle",
+           "type": null,
+           "ref": {
+            "kind": "local",
+            "value": 4
+           }
+          },
+          "value": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "floor-divide",
+            "ref": {
+             "kind": "builtin",
+             "value": "floor-divide"
+            }
+           },
+           "args": [
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "add",
+              "ref": {
+               "kind": "builtin",
+               "value": "add"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "low",
+               "ref": {
+                "kind": "local",
+                "value": 2
+               }
+              },
+              {
+               "node": "Name",
+               "name": "high",
+               "ref": {
+                "kind": "local",
+                "value": 3
+               }
+              }
+             ],
+             "slots": []
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            }
+           ],
+           "slots": []
+          },
+          "mutable": false,
+          "type": null
+         },
+         {
+          "node": "Bind",
+          "target": {
+           "node": "PBind",
+           "name": "value",
+           "type": null,
+           "ref": {
+            "kind": "local",
+            "value": 5
+           }
+          },
+          "value": {
+           "node": "Index",
+           "target": {
+            "node": "Name",
+            "name": "xs",
+            "ref": {
+             "kind": "local",
+             "value": 1
+            }
+           },
+           "index": {
+            "node": "Name",
+            "name": "middle",
+            "ref": {
+             "kind": "local",
+             "value": 4
+            }
+           },
+           "optional": false
+          },
+          "mutable": false,
+          "type": null
+         },
+         {
+          "node": "If",
+          "branches": [
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "equal",
+              "ref": {
+               "kind": "builtin",
+               "value": "equal"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "value",
+               "ref": {
+                "kind": "local",
+                "value": 5
+               }
+              },
+              {
+               "node": "Name",
+               "name": "target",
+               "ref": {
+                "kind": "local",
+                "value": 0
+               }
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "Return",
+               "value": {
+                "node": "Name",
+                "name": "middle",
+                "ref": {
+                 "kind": "local",
+                 "value": 4
+                }
+               }
+              }
+             ]
+            }
+           },
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "less",
+              "ref": {
+               "kind": "builtin",
+               "value": "less"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "value",
+               "ref": {
+                "kind": "local",
+                "value": 5
+               }
+              },
+              {
+               "node": "Name",
+               "name": "target",
+               "ref": {
+                "kind": "local",
+                "value": 0
+               }
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "Rebind",
+               "name": {
+                "node": "Name",
+                "name": "low",
+                "ref": {
+                 "kind": "local",
+                 "value": 2
+                }
+               },
+               "value": {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "add",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "add"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Name",
+                  "name": "middle",
+                  "ref": {
+                   "kind": "local",
+                   "value": 4
+                  }
+                 },
+                 {
+                  "node": "Lit",
+                  "kind": "integer",
+                  "value": 1
+                 }
+                ],
+                "slots": []
+               }
+              }
+             ]
+            }
+           }
+          ],
+          "else": {
+           "node": "Block",
+           "stmts": [
+            {
+             "node": "Rebind",
+             "name": {
+              "node": "Name",
+              "name": "high",
+              "ref": {
+               "kind": "local",
+               "value": 3
+              }
+             },
+             "value": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "subtract",
+               "ref": {
+                "kind": "builtin",
+                "value": "subtract"
+               }
+              },
+              "args": [
+               {
+                "node": "Name",
+                "name": "middle",
+                "ref": {
+                 "kind": "local",
+                 "value": 4
+                }
+               },
+               {
+                "node": "Lit",
+                "kind": "integer",
+                "value": 1
+               }
+              ],
+              "slots": []
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 0
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "xs",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 5
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 7
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 11
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 13
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 17
+         }
+        ]
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "find",
+           "ref": {
+            "kind": "def",
+            "value": "find"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 11
+           },
+           {
+            "node": "Name",
+            "name": "xs",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "find",
+           "ref": {
+            "kind": "def",
+            "value": "find"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Name",
+            "name": "xs",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "find",
+           "ref": {
+            "kind": "def",
+            "value": "find"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 4
+           },
+           {
+            "node": "Name",
+            "name": "xs",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

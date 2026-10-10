@@ -1,0 +1,37 @@
+module fan-out
+edition 0
+needs console and tasks
+
+
+to fetch name (text) d giving text, needs tasks, may fail with not-found:
+    sleep for d
+    if name equals "missing":
+        give back problem not-found
+    give back "{name} ok"
+
+
+to gather of names (a list of text) giving a list of text, needs tasks, may fail with not-found and several and timed-out:
+    within 5 seconds:
+        give back each n in names at the same time, fetch(n, 1 second)
+    give back []
+
+
+to race giving a list of text, needs tasks, may fail with not-found and several and timed-out:
+    within 3 seconds:
+        give back all of:
+            fetch("slow", 1 minute)
+            fetch("fast", 1 second)
+    give back []
+
+
+to main, needs console and tasks, may fail with not-found and several and timed-out:
+    let parts be all of:
+        weather: fetch("weather", 2 seconds)
+        rates: fetch("rates", 1 second)
+    show parts's weather
+    show parts's rates
+    show gather of ["a", "b"]
+    let one be gather of ["a", "missing"]
+    show one's kind
+    let late be race()
+    show late's kind

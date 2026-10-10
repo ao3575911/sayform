@@ -1,0 +1,23 @@
+module shapes
+edition 0
+needs console
+
+
+a Shape is one of:
+    circle with a radius (a number)
+    rectangle with a width (a number) and a height (a number)
+
+
+to area of s (a Shape) giving a number:
+    match s:
+        when circle with radius ?r:
+            give back 3 * r * r
+        when rectangle with width ?w and height ?h, if w equals h:
+            give back w * w
+        when rectangle with width ?w and height ?h:
+            give back w * h
+
+
+to main, needs console:
+    for each s in [circle with radius 2, rectangle with width 3 and height 3, rectangle with width 2 and height 5]:
+        show area of s

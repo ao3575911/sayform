@@ -1,0 +1,14 @@
+module line-count
+edition 0
+needs console and files
+
+
+to count-lines of path (text) giving an integer, needs files, may fail with not-found:
+    let text be try files.read-text(path)
+    give back count of split(text, by="\n")
+
+
+to main, needs console and files, may fail with not-found:
+    with files limited to "./data", read only:
+        show count-lines of "./data/lines.txt"
+        show count-lines of "./secret.txt"
