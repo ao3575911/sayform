@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sayform"
-version = "0.0.1"
+version = "0.0.2"
 description = "Sayform: a small language that reads like English, prints as symbols, and declares what it may touch."
 readme = "README.md"
 license = "Apache-2.0"
@@ -43,6 +43,9 @@ include = ["src", "prelude", "spec", "tests", "tools", "conformance", "examples"
 line-length = 120
 target-version = "py312"
 extend-exclude = ["src/sayform/_unicode", "src/sayform/codes.py"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

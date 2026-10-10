@@ -161,7 +161,5 @@ class Sink:
 
 def dumps(diags: list[Diag]) -> str:
     return json.dumps(
-        {"version": "say-json/1", "diagnostics": [d.to_json() for d in diags]},
-        ensure_ascii=False,
-        indent=2,
+        {"version": "say-json/1", "diagnostics": [d.to_json() for d in diags]}, ensure_ascii=False, indent=2
     )

@@ -51,6 +51,7 @@ def check_module(mod: C.Module, sink: Sink | None = None) -> None:
         if isinstance(d, C.Func):
             check_tasks(d, funcs)
     check_dialect(mod, sink)
+    check_static(mod, sink)
     header = {e.effect for e in mod.needs}
     if mod.needs and union - header:
         missing = sorted(union - header)[0]
@@ -112,3 +113,91 @@ def check_dialect(mod: C.Module, sink: Sink | None) -> None:
         if strict and isinstance(d, C.Func) and (d.result is None or any(p.type is None for p in d.params)):
             if d.name != "main" or any(p.type is None for p in d.params):
                 raise SayError("E0205", d.line, name=d.name)
+
+
+NUMS = {"integer", "decimal", "approx"}
+ORDER = {"less", "less-eq", "greater", "greater-eq"}
+KINDS = {C.ListLit: "a list", C.MapLit: "a map", C.SetLit: "a set", C.Interp: "text", C.RecordLit: "a record"}
+
+
+def kind_of(n: Any) -> str | None:
+    """The static kind of a literal-shaped node, or None when it is not known statically."""
+    if isinstance(n, C.Lambda) and not n.params:
+        return kind_of(n.body)
+    if isinstance(n, C.Lit):
+        return {"truth": "truth", "text": "text", "quantity": "time"}.get(n.kind, "number" if n.kind in NUMS else None)
+    return KINDS.get(type(n))
+
+
+def check_static(mod: C.Module, sink: Sink | None) -> None:
+    """Static checks of spec 05 section 1.1 and spec 06/07: `=` as a statement (E0111), no
+    truthiness (E0112, E0201), dimensions (E0203), call shape (E0408-E0410), orphan methods
+    (E0403), duplicate literal keys (E0821) and ignored problems (W0201)."""
+    from .lower import HOST_SIGS, PRELUDE_NAMES
+
+    names = [d.name for d in mod.body if isinstance(d, C.Func)]
+    funcs = {d.name: d for d in mod.body if isinstance(d, C.Func) and names.count(d.name) == 1}
+    owned = {d.name for d in mod.body if isinstance(d, (C.RecordDef, C.VariantDef))}
+    for d in mod.body:
+        if isinstance(d, C.Func) and (d.name in HOST_SIGS or d.name in PRELUDE_NAMES):
+            types = [p.type.ref for p in d.params if isinstance(p.type, C.TName)]
+            if not set(types) & owned:
+                raise SayError("E0403", d.line, fn=d.name, types=", ".join(types) or "untyped parameters")
+    for x in C.walk(mod):
+        line = getattr(x, "line", 0)
+        if isinstance(x, C.ExprStmt) and isinstance(x.expr, C.Call) and isinstance(x.expr.fn, C.Name):
+            fn, args = x.expr.fn, x.expr.args
+            if fn.ref.kind == "builtin" and fn.name == "equal" and isinstance(args[0], C.Name):
+                raise SayError("E0111", line, name=args[0].name)
+            if fn.ref.kind == "def" and fn.name in funcs and funcs[fn.name].fails and sink is not None:
+                sink.warn("W0201", line, call=fn.name)
+        if isinstance(x, (C.If, C.While)):
+            for cond in [b.cond for b in x.branches] if isinstance(x, C.If) else [x.cond]:
+                k = kind_of(cond)
+                if k not in (None, "truth"):
+                    raise SayError("E0201", line, expected="yes or no", actual=k, context="Conditions must be Truth",
+                                   fix="Compare explicitly, for example `n is greater than 0`")  # fmt: skip
+        if isinstance(x, (C.MapLit, C.SetLit)):
+            keys = [k for k, _ in x.pairs] if isinstance(x, C.MapLit) else list(x.items)
+            lits = [(k.kind, repr(k.value)) for k in keys if isinstance(k, C.Lit)]
+            dup = next((k for k in lits if lits.count(k) > 1), None)
+            if dup is not None:
+                raise SayError("E0821", line, key=dup[1])
+        if not (isinstance(x, C.Call) and isinstance(x.fn, C.Name)):
+            continue
+        name, kinds = x.fn.name, [kind_of(a) for a in x.args]
+        if x.fn.ref.kind == "builtin" and name in ("and", "or", "not"):
+            bad = next((k for k in kinds if k not in (None, "truth")), None)
+            if bad is not None:
+                raise SayError("E0112", line, op=name, type=bad)
+        if x.fn.ref.kind == "builtin" and name in {"add", "subtract", *ORDER} and len(kinds) == 2:
+            if "time" in kinds and kinds[0] != kinds[1] and None not in kinds:
+                raise SayError("E0203", line, a=expr(x.args[0]), b=expr(x.args[1]), dim1=kinds[0], dim2=kinds[1])
+            if name in ORDER and {"text", "number"} == set(kinds):
+                raise SayError("E0201", line, expected=kinds[0], actual=kinds[1], context=f"`{name}` compares like with like",
+                               fix="Convert one side first")  # fmt: skip
+        if x.fn.ref.kind == "def" and name in funcs:
+            call_shape(funcs[name], x)
+
+
+def expr(n: Any) -> str:
+    from .printer import print_expr
+
+    return print_expr(n)
+
+
+def call_shape(f: C.Func, call: C.Call) -> None:
+    """Spec 03 section 7.1: positional, slot and named arguments against the signature."""
+    keys = [k for k, _ in call.slots]
+    key = {p.name: p.name if p.slot == "with" else p.slot for p in f.params if p.slot not in (None, "of")}
+    for k in keys:
+        if k not in key.values():
+            raise SayError("E0408", call.line, fn=f.name, name=k, params=", ".join(sorted(key.values())) or "none")
+        if keys.count(k) > 1:
+            raise SayError("E0410", call.line, fn=f.name, problem=f"`{k}` twice")
+    free = [p for p in f.params if key.get(p.name) not in keys]
+    if len(call.args) > len(free):
+        raise SayError("E0410", call.line, fn=f.name, problem=f"{len(call.args)} positional arguments for {len(free)}")
+    for p in free[len(call.args) :]:
+        if p.default is None:
+            raise SayError("E0409", call.line, fn=f.name, param=p.name, lead=key.get(p.name) or p.name)

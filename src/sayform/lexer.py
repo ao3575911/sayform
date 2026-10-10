@@ -69,12 +69,7 @@ def decode(data: bytes) -> str:
     except UnicodeDecodeError as e:
         line = data[: e.start].count(b"\n") + 1
         raise SayError(
-            "E0105",
-            line,
-            1,
-            text="(bytes)",
-            reason="the file is not valid UTF-8",
-            fix="save the file as UTF-8",
+            "E0105", line, 1, text="(bytes)", reason="the file is not valid UTF-8", fix="save the file as UTF-8"
         ) from None
     if text.startswith("\ufeff"):
         text = text[1:]
@@ -377,10 +372,7 @@ class Lexer:
                 fix="wrap the expression in brackets to continue it on the next line",
             )
         name = unicodedata.name(c, f"U+{ord(c):04X}")
-        hint = {
-            ";": "end the statement with a line end instead",
-            "@": "`@` has no meaning in edition 0",
-        }
+        hint = {";": "end the statement with a line end instead", "@": "`@` has no meaning in edition 0"}
         raise self.err(
             "E0105",
             text=c,
