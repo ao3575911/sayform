@@ -107,9 +107,11 @@ def run_file(path: str, write: Any = None, allow: set[str] | None = None, deny: 
     try:
         _, mod, _ = load(path)
         policy = deny or set()
-        _, result = big_stack(
+        ev, result = big_stack(
             lambda: program(mod, write or out, read_line, lambda e: e not in policy and e != "network")
         )
+        for w in ev.warnings:
+            print(w.render(), file=sys.stderr)
     except SayError as e:
         e.diag.file = e.diag.file or path
         report(e, path, False)

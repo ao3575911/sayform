@@ -10,6 +10,7 @@ from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 from typing import Any, TypeVar
 
+from . import core as C
 from . import values as V
 from .diagnostics import SayError, panic
 from .evaluator import Builtin, Env, Evaluator, Gen
@@ -315,3 +316,106 @@ def random_integer(ev: Evaluator, env: Env, from_: Any, to: Any) -> Gen:
     bad = env.caps["random"].check()
     return bad if bad is not None else ev.rng.randint(from_, to)
     yield
+
+
+# ---- 2.6 symbolic ------------------------------------------------------------------------
+def expr_arg(op: str, e: Any) -> Any:
+    if not isinstance(e, V.ExprV):
+        raise mismatch(op, e, expected="an expression")
+    return e.node
+
+
+@host("evaluate", gen=True)
+def evaluate(ev: Evaluator, env: Env, e: Any, bindings: Any = None) -> Gen:
+    from .evaluator import NotFound
+
+    node = expr_arg("evaluate", e)
+    free = MapV() if bindings is None else bindings
+    if not isinstance(free, MapV) or not all(isinstance(k, Sym) for k in free):
+        raise mismatch("evaluate", free, expected="a map from symbols to values")
+    try:
+        return (yield from ev.ev(node, Env({}, env.caps, env.func, {k.name: v for k, v in free.items()})))
+    except NotFound as nf:
+        return Problem(Sym("not-found"), f"`{nf.args[0]}` has no binding")
+
+
+@host("match")
+def match_(e: Any, pattern: Any) -> Any:
+    from .symbolic import match_expr
+
+    node = e.node if isinstance(e, V.ExprV) else V_node(e)
+    pat = expr_arg("matches", pattern)
+    got = match_expr(pat.expr if isinstance(pat, C.Quote) else pat, node)
+    return None if got is None else MapV({Sym(k): V.ExprV(v) for k, v in got.items()})
+
+
+def V_node(v: Any) -> Any:
+    from .evaluator import value_node
+
+    return value_node(v)
+
+
+def guard_fn(ev: Evaluator, env: Env) -> Any:
+    def check(g: Any, binds: dict[str, Any]) -> bool:
+        vals = {k: (v.value if isinstance(v, C.Lit) else V.ExprV(v)) for k, v in binds.items()}
+
+        def free(n: Any) -> Any:
+            if isinstance(n, C.Name) and n.ref.kind == "patvar":
+                return C.Name(n.name, C.Ref("free", n.name))
+            return n
+
+        from .parser import transform
+
+        r = ev.run(ev.ev(transform(g, free), Env({}, {}, None, vals)))
+        return r is True
+
+    return check
+
+
+def ruleset_arg(op: str, rs: Any) -> Any:
+    from .symbolic import RulesetV
+
+    if not isinstance(rs, RulesetV):
+        raise mismatch(op, rs, expected="a ruleset")
+    return rs
+
+
+@host("egraph-simplify", gen=True)
+def egraph_simplify(ev: Evaluator, env: Env, e: Any, rules: Any, nodes: Any = 10000, steps: Any = 30) -> Gen:
+    from .symbolic import simplify
+
+    best, done = simplify(expr_arg("simplify", e), ruleset_arg("simplify", rules), guard_fn(ev, env), nodes, steps)
+    if not done:
+        ev.warn("W0912", budget=f"{nodes} nodes / {steps} steps")
+    return V.ExprV(best)
+    yield
+
+
+@host("egraph-equiv", gen=True)
+def egraph_equiv(ev: Evaluator, env: Env, a: Any, b: Any, rules: Any) -> Gen:
+    from .symbolic import simplify
+
+    rs, g = ruleset_arg("equivalent", rules), guard_fn(ev, env)
+    x, dx = simplify(expr_arg("equivalent", a), rs, g)
+    y, dy = simplify(expr_arg("equivalent", b), rs, g)
+    if x == y:
+        return True
+    if dx and dy:
+        return False
+    ev.warn("W0912", budget="10000 nodes / 30 steps")
+    return None
+    yield
+
+
+@host("head")
+def head(e: Any) -> Sym:
+    from .symbolic import head as h
+
+    return Sym(h(expr_arg("head", e)))
+
+
+@host("arguments")
+def arguments(e: Any) -> tuple[Any, ...]:
+    from .symbolic import arguments as args
+
+    return tuple(V.ExprV(x) if isinstance(x, (C.Node, C.Ref)) else x for x in args(expr_arg("arguments", e)))
