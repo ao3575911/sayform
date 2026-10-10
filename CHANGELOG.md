@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M9: tooling. `say explain FILE[:LINE] [--json]` (`explain.py`: one template per statement
+  family, builtin/user-call templates, footnote folding beyond depth 3, canonical-words fallback
+  so explain is total; goldens E1–E3), `say check [--strict] [--json]`, `say test`
+  (line and block checks, note `example:` lines, SAY-E1005, failure output with expected /
+  actual / explain sentence, `--allow`, `--shuffle-tasks`, `--json`, exit 3 on failure), and the
+  REPL (`say` with no arguments: canonical echo, `:words`, `:symbols`, `:explain`, `:core`,
+  `:type`, `:hash`, `:load`, `:caps`, `:grant` with confirmation, `:quit`). Tests `TOOL-01`…`20`,
+  `EXP-01`…`12`, `TEST-01`…`10`, `ERR-FORMAT`, `ERR-RETIRED` and a first set of `ERR-<code>` rows.
 - M8: structured concurrency (`tasks.py`): a deterministic single-threaded scheduler (FIFO
   ready deque, timer min-heap, per-channel FIFO wait queues, virtual clock for tests, real clock
   for `say run`), `together:`, `all of:` (list or labelled record), `first of:`, `within D:`,
