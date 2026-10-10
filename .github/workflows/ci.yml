@@ -28,6 +28,8 @@ jobs:
       - run: pytest -q
       - run: python tools/check_budgets.py
       - run: python tools/check_spec_sync.py
+      - name: Formatter-stable sources
+        run: say fmt --check prelude/*.say examples/*.say
       - name: Wheel smoke test
         run: |
           pip install build
@@ -35,6 +37,7 @@ jobs:
           python -m venv /tmp/wheel-env
           /tmp/wheel-env/bin/pip install dist/*.whl
           /tmp/wheel-env/bin/say --version
+          cd /tmp && /tmp/wheel-env/bin/say run "$GITHUB_WORKSPACE/examples/hello.say" | grep -qx "Hello, world"
 
   test:
     if: always()

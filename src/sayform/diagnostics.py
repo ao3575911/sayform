@@ -14,7 +14,7 @@ from typing import Any
 
 from .codes import CODES
 
-_PH = re.compile(r"\{([a-z0-9_]+)(?::[^{}]*)?\}")
+_PH = re.compile(r"\{([a-z0-9_/]+)(?::[^{}]*)?\}")
 EXIT = {"error": 2, "panic": 70, "refused": 4, "warning": 0}
 
 
@@ -70,6 +70,9 @@ class Diag:
         if source is not None and self.line > 0:
             lines = source.splitlines()
             if self.line <= len(lines):
+                text = lines[self.line - 1]
+                if self.column <= 0:
+                    self.column = len(text) - len(text.lstrip()) + 1
                 num = str(self.line)
                 pad = " " * len(num)
                 out.append(f" {pad} |")

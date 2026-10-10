@@ -1,0 +1,146 @@
+module prelude
+edition 0
+
+
+note: The 21 prelude functions written in Sayform (spec/12-stdlib.md section 3). The constant empty-set is provided by the host because no Sayform expression builds an empty set.
+a Pair of A and B has a left (A) and a right (B)
+
+
+to less-eq x y giving a truth:
+    give back not y is less than x
+
+
+to greater x y giving a truth:
+    give back y is less than x
+
+
+to greater-eq x y giving a truth:
+    give back not x is less than y
+
+
+to between x lo hi with low-inclusive (a truth, default yes) with high-inclusive (a truth, default yes) giving a truth:
+    let above be lo is less than x or (low-inclusive and lo equals x)
+    give back above and (x is less than hi or (high-inclusive and x equals hi))
+
+
+to absolute of x (a number) giving a number:
+    if x is less than 0:
+        give back negative x
+    give back x
+
+
+to checked-divide x (a number) by d (a number) giving a number, may fail with division-by-zero:
+    if d equals 0:
+        give back problem division-by-zero with message "cannot divide by zero"
+    give back x divided by d
+
+
+to join-all of items (a list of text) by sep (text) giving text:
+    let out be "", changeable
+    let first-item be yes, changeable
+    for each piece in items:
+        if first-item:
+            set out to out joined with piece
+            set first-item to no
+        otherwise:
+            set out to out joined with sep joined with piece
+    give back out
+
+
+to map of c f giving anything:
+    if c is a map from anything to anything:
+        let out be {}, changeable
+        for each k in keys of c:
+            add {k: f(item k of c)} to out
+        give back out
+    let out be [], changeable
+    if c is a set of anything:
+        set out to empty-set
+    for each x in c:
+        add f(x) to out
+    give back out
+
+
+to filter of c f giving anything:
+    let out be [], changeable
+    if c is a set of anything:
+        set out to empty-set
+    for each x in c:
+        if f(x):
+            add x to out
+    give back out
+
+
+to sort of c giving a list of anything:
+    give back sort-by(c, given x, x)
+
+
+to first of c giving anything or nothing:
+    give back item 1 of c, if any
+
+
+to last of c giving anything or nothing:
+    give back item negative 1 of c, if any
+
+
+to take n (an integer) from c giving a list of anything:
+    let out be [], changeable
+    for each x in c:
+        if count of out equals n:
+            stop
+        add x to out
+    give back out
+
+
+to drop n (an integer) from c giving a list of anything:
+    let out be [], changeable
+    let seen be 0, changeable
+    for each x in c:
+        if seen is at least n:
+            add x to out
+        add 1 to seen
+    give back out
+
+
+to sum of c giving a number:
+    let total be 0, changeable
+    for each x in c:
+        set total to total plus x
+    give back total
+
+
+to group-by of c key giving a map from anything to lists of anything:
+    let groups be {}, changeable
+    for each x in c:
+        let k be key(x)
+        let existing be item k of groups, if any
+        add {k: added(existing or else [], x)} to groups
+    give back groups
+
+
+to zip xs (a list of A) ys (a list of B) giving a list of pairs, for any A and B:
+    let out be [], changeable
+    let i be 1, changeable
+    while (i is at most count of xs) and i is at most count of ys:
+        add (Pair with left (item i of xs) and right item i of ys) to out
+        add 1 to i
+    give back out
+
+
+to is-empty of c giving a truth:
+    give back count of c equals 0
+
+
+to reversed of c (a list of anything) giving a list of anything:
+    let out be [], changeable
+    for each x in c:
+        set out to [x] joined with out
+    give back out
+
+
+to largest of items (a list of T) giving a T or nothing, for any T:
+    give back last of sort of items
+
+
+to smallest of items (a list of T) giving a T or nothing, for any T:
+    give back first of sort of items
