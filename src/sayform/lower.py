@@ -140,17 +140,29 @@ PRELUDE_NAMES: tuple[str, ...] = (
 PRELUDE_EXTRAS = ("Pair", "empty-set")
 #: Signatures of prelude functions that take slot or named arguments (spec 12 section 3).
 PRELUDE_SIGS: dict[str, list[tuple[str | None, str, bool]]] = {
-    "between": [
-        (P, "x", False),
-        (P, "lo", False),
-        (P, "hi", False),
-        ("with", "low-inclusive", True),
-        ("with", "high-inclusive", True),
-    ],
+    "less-eq": [(P, "a", False), (P, "b", False)],
+    "greater": [(P, "a", False), (P, "b", False)],
+    "greater-eq": [(P, "a", False), (P, "b", False)],
+    "between": [(P, "x", False), (P, "lo", False), (P, "hi", False),
+                ("with", "low-inclusive", True), ("with", "high-inclusive", True)],
+    "absolute": [("of", "x", False)],
     "checked-divide": [(P, "a", False), ("by", "b", False)],
+    "join-all": [("of", "items", False), ("by", "sep", False)],
+    "map": [("of", "c", False), (P, "f", False)],
+    "filter": [("of", "c", False), (P, "f", False)],
+    "sort": [("of", "c", False)],
+    "first": [("of", "c", False)],
+    "last": [("of", "c", False)],
     "take": [(P, "n", False), ("from", "c", False)],
     "drop": [(P, "n", False), ("from", "c", False)],
-}
+    "sum": [("of", "c", False)],
+    "group-by": [("of", "c", False), (P, "key", False)],
+    "zip": [(P, "a", False), (P, "b", False)],
+    "is-empty": [("of", "c", False)],
+    "reversed": [("of", "c", False)],
+    "largest": [("of", "items", False)],
+    "smallest": [("of", "items", False)],
+}  # fmt: skip
 BUILTIN_NAMES = frozenset(HOST_SIGS) | frozenset(PRELUDE_NAMES) | frozenset(PRELUDE_EXTRAS)
 HOST_MODULES = frozenset({"files", "clock", "random"})
 BUILTIN_EFFECTS: dict[str, str] = {

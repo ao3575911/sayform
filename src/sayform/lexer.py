@@ -424,7 +424,9 @@ class Lexer:
             )
         if not raw.isascii():
             self.non_ascii.append((w, self.line))
-        if len(w) >= 2 and w != w.lower() and w.casefold() in RESERVED_SET and w != "Set":
+        if (
+            len(w) >= 2 and w != w.lower() and w.casefold() in RESERVED_SET and w not in ("Set", "Nothing")
+        ):  # spec-gap #3
             raise SayError("E0103", self.line, self.col(start), word=raw, kw=w.casefold())
         return w
 
@@ -596,10 +598,9 @@ class Lexer:
         while self.i < len(s):
             c = s[self.i]
             if c == '"':
-                j = self.i + 1
-                while j < len(s) and s[j] not in '"\n':
-                    j += 2 if s[j] == "\\" else 1
-                self.i = j + 1
+                self.i = skip_text(s, self.i + 1)
+                if self.i < 0:
+                    raise SayError("E0106", line, col, at_line=line, col=col)
                 continue
             if c == "\n":
                 raise SayError("E0106", line, col, at_line=line, col=col)
@@ -613,6 +614,28 @@ class Lexer:
                 depth -= 1
             self.i += 1
         raise SayError("E0106", line, col, at_line=line, col=col)
+
+
+def skip_text(s: str, j: int) -> int:
+    """Index just after the text literal whose body starts at `j` (nested interpolations
+    may contain text literals); -1 if it does not end on this line."""
+    while j < len(s) and s[j] not in '"\n':
+        if s[j] == "\\":
+            j += 2
+        elif s[j] == "{":
+            depth, j = 0, j + 1
+            while j < len(s) and s[j] != "\n" and not (s[j] == "}" and depth == 0):
+                if s[j] == '"':
+                    j = skip_text(s, j + 1)
+                    if j < 0:
+                        return -1
+                    continue
+                depth += {"{": 1, "}": -1}.get(s[j], 0)
+                j += 1
+            j += 1
+        else:
+            j += 1
+    return j + 1 if j < len(s) and s[j] == '"' else -1
 
 
 def dedent_parts(parts: list[Any], s: str, start: int) -> list[Any]:

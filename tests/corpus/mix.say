@@ -1,0 +1,76 @@
+module mix
+edition 0
+needs console
+
+
+a Person has a name (text) and an age (an integer, default 0), where age is at least 0
+
+a Shape is one of:
+    circle with a radius (a number)
+    square with a side (a number)
+    dot
+
+# area of a shape
+to area of s (a Shape) giving a number:
+    match s:
+        when circle with radius:
+            give back 3 * radius * radius
+        when square with side, if side > 0:
+            give back side ^ 2
+        otherwise:
+            give back 0
+
+def clamp(x: Number, lo: Number = 0, hi: Number = 10) -> Number:
+    if x < lo:
+        return lo
+    elif x > hi:
+        return hi
+    return x
+
+to main, needs console:
+    let people be [Person with name "Ada" and age 36, Person(name="Bob", age=17)]
+    let adults be people where age is at least 18 sorted by name, descending
+    show count of adults
+    let total be 0, changeable
+    for each p in people:
+        add p's age to total
+    repeat 3 times:
+        set total to total + 1
+    var n = 0
+    while n < 5:
+        n += 1
+        if n = 3:
+            continue
+    show "total {total}, ok"
+    show (from 1 to 10 by 2)
+    show (1..<5)
+    let f be given x, x + 1
+    let g be (a1, b1) => a1 * b1
+    show (f(2) + g(2, 3))
+    show (1 < n <= 10)
+    show (n is between 1 and 10, exclusive above)
+    show (n is not equal to 4 and not (n is in [1, 2]) or n >= 7)
+    show nothing or else 5
+    show (-n + negative 2)
+    show item 2 of [1, 2, 3]
+    show [1, 2, 3][1]
+    show {"a": 1}
+    show {1, 2}
+    show {}
+    show 'sym
+    show the symbol other
+    show List[Number]
+    show (7 divided by 2, rounded down)
+    show (7 // 2 % 3)
+    show people[1]?.name
+    show take 2 from people
+    show people each it's name joined by ", "
+    show (people each name) joined with ["x"]
+    let p2 be people[1].with(age=40)
+    show p2
+    show (n is a number)
+    show (n is not nothing)
+    show ([1] is empty)
+    show try area of dot
+
+check that 1 equals 1
