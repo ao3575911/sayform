@@ -183,7 +183,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("run", help="run a program's main")
     p.add_argument("file")
     p.add_argument("--deny", action="append", help="refuse an effect (host policy)")
-    p.add_argument("args", nargs=argparse.REMAINDER)
+    p.add_argument("args", nargs="*", help="program arguments after `--`")
     for name in ("check", "explain", "test", "repl"):
         p = sub.add_parser(name)
         p.add_argument("args", nargs=argparse.REMAINDER)

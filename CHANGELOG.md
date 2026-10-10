@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M5: effects and capabilities: static effect checks before a run (`checker.py`, SAY-E0501,
+  SAY-E0601, module header coverage, top-level `let`), capability context with narrowing on
+  calls and `with … limited to …[, read only]` (SAY-E0504 on widening), revocation at block exit
+  (SAY-E0502 for escaped closures), host policy (`say run --deny`, `network` refused, SAY-E0506
+  exit 4), `files.read-text`/`files.write-text` confined to the narrowed subtree, `clock.now`
+  (virtual when seeded) and seeded `random.random-integer`, the `CapabilityBacking` hook
+  (non-ok answer → problem `capability-revoked`). Tests `CAP-01`…`CAP-12`, `CAP-16`, `CAP-17`, `CAP-20`.
 - M4: values and evaluator (`values.py`, `evaluator.py`, `builtins.py`): exact numbers
   (Integer/Decimal/Rational normalisation, scale rules, `//`, `mod`, `^`), approx contagion,
   text by grapheme clusters, records/variants with defaults, invariants and copy-with,
