@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M10: modules and the `strict` dialect. `modules.py` finds `use a.b` at `a/b.say` under the
+  package root (`say.toml` directory, else the file's directory), loads dependencies first,
+  reports missing modules, path mismatches and cycles (with the cycle printed) as SAY-E0701,
+  binds `use M: a, b` names, `last-segment.name` and `alias.name`, and refuses a name defined by
+  two modules (SAY-E0404). `use` grants no capabilities. Checker: exhaustive variant matches
+  (SAY-W0911, an error under `strict`), `strict` ASCII names (SAY-E0124) and typed exports
+  (SAY-E0205). A missing `edition` is now reported as SAY-E1012 with warning severity (the
+  registry has no separate W1012 entry). Tests `MOD-01`…`MOD-14`, `DIA-01`…`DIA-08`.
 - M9: tooling. `say explain FILE[:LINE] [--json]` (`explain.py`: one template per statement
   family, builtin/user-call templates, footnote folding beyond depth 3, canonical-words fallback
   so explain is total; goldens E1–E3), `say check [--strict] [--json]`, `say test`
@@ -59,6 +67,8 @@ All notable changes to this project are documented here. The format follows
   `HASH-01`...`HASH-12` (byte vectors in `conformance/hash/vectors.toml`), G-01 prints.
 
 ### Spec gaps
+- Edition 0 modules share one runtime namespace; a top-level name defined by two modules
+  is refused with SAY-E0404 rather than kept module-private (spec 10 O-3 leaves privacy open).
 - Display of the anonymous record from a labelled `all of:` is unspecified; we print
   `record with p 1 and q 2`. (decided provisionally, flagged)
 - `add 1 to n` / `n += 1` on a number adds (12-stdlib defines `added` only for collections).

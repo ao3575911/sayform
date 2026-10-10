@@ -109,11 +109,19 @@ def run_file(
         sys.stdout.write(text + end)
 
     try:
-        _, mod, _ = load(path)
+        from .modules import load_tree
+
+        mod, deps = load_tree(path)
         policy = deny or set()
         ev, result = big_stack(
             lambda: program(
-                mod, write or out, read_line, lambda e: e not in policy and e != "network", real=True, shuffle=shuffle
+                mod,
+                write or out,
+                read_line,
+                lambda e: e not in policy and e != "network",
+                real=True,
+                shuffle=shuffle,
+                deps=tuple(deps),
             )
         )
         for w in ev.warnings:

@@ -867,6 +867,7 @@ def program(
     seed: Any = None,
     real: bool = False,
     shuffle: int | None = None,
+    deps: tuple[C.Module, ...] = (),
 ) -> tuple[Evaluator, Any]:
     """Load prelude and `mod`, then call `main` with the capabilities it declares that the
     host grants (spec 07 section 1.5). Returns the evaluator and main's result."""
@@ -883,7 +884,11 @@ def program(
         ev.clock = Decimal(0)
     ev.globals["empty-set"] = SetV(())
     ev.run(ev.load(_PRELUDE[0]))
-    ev.run(ev.load(mod))
+    from .modules import link
+
+    for d in deps:
+        check_module(d)
+    link(ev, mod, list(deps), ev.run)
     main = ev.globals.get("main")
     if not isinstance(main, Generic):
         return ev, None
