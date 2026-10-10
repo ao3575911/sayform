@@ -1,0 +1,16 @@
+module gst
+edition 0
+needs console
+
+
+note: Australian GST is 10% of the GST-exclusive price.
+    example: gst of 12.50 gives 1.25
+to gst of price (a decimal) giving a decimal:
+    give back price * 0.10
+
+
+to main, needs console:
+    let prices be [12.50, 3.20, 0.99]
+    let total-gst be sum of (prices each gst of it)
+    show "GST: {total-gst}"
+    show "Rounded: {round total-gst with places 2}"

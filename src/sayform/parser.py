@@ -314,7 +314,10 @@ class Parser:
                 depth -= 1
                 if depth == 0:
                     in_variant = False
-            elif tok.kind == "NEWLINE":
+            if tok.kind in ("INDENT", "DEDENT"):
+                i += 1
+                continue
+            if tok.kind == "NEWLINE":
                 line_start = True
                 i += 1
                 continue
@@ -626,14 +629,14 @@ class Parser:
             pname = self.word("a parameter name")
             ptype, default = None, None
             if self.eat_op("("):
-                ptype = self.type_w()
+                ptype = self.type_any()
                 if self.eat_op(","):
                     self.expect("default")
                     default = self.expr()
                 self.expect_op(")")
             params.append(C.Param(pname, lead, ptype, default))
             self.check_case(pname, ptok, False, "parameter")
-        result = self.type_w() if self.eat("giving") else None
+        result = self.type_any() if self.eat("giving") else None
         effects: tuple[C.EffItem, ...] = ()
         fails: list[str] = []
         generics: list[C.TParam] = []
@@ -874,7 +877,7 @@ class Parser:
         fname = self.word("a field name")
         self.check_case(fname, ftok, False, "field")
         self.expect_op("(")
-        ftype = tvars(self.type_w(), tvs)
+        ftype = tvars(self.type_any(), tvs)
         default = None
         if self.eat_op(","):
             self.expect("default")
@@ -1611,7 +1614,7 @@ class Parser:
 
     def is_core(self, left: Any, operand: Any, line: int, start: int) -> Any:
         tok = self.cur
-        if self.at("a", "an"):
+        if self.at("a", "an", "text", "anything"):
             return C.TypeTest(left, self.type_w(), line=line)
         if self.eat("nothing"):
             return C.TypeTest(left, C.TName("nothing"), line=line)
@@ -1857,7 +1860,8 @@ class Parser:
             qualified = (
                 name in self.modules and self.nxt().is_op(".") and not self.nxt().spaced and self.lookup(name) is None
             )
-            if (qualified or self.is_callee(name)) and not self.nxt().is_op("=>"):
+            special = name in ("problem", "evaluate", "simplify", "item") and not self.nxt().is_op("(")
+            if (qualified or self.is_callee(name)) and not self.nxt().is_op("=>") and not special:
                 return self.pc_call()
         e = self.postfix()
         if (
@@ -1968,7 +1972,11 @@ class Parser:
         self.stop = set()
         try:
             while not self.at_op(")"):
-                if self.cur.kind == "NAME" and self.nxt().is_op("="):
+                if (
+                    self.cur.kind == "NAME"
+                    and self.nxt().is_op("=")
+                    and (self.cur.value not in RESERVED_SET or self.cur.value in SLOT_WORDS)
+                ):
                     key = str(self.adv().value)
                     self.adv()
                     slots.append((key, self.expr()))
@@ -2644,6 +2652,9 @@ def make_union(types: list[Any]) -> Any:
     (spec 04 section 2.4; ordering by SCS-1 bytes is applied by `scs.py`)."""
     flat: list[Any] = []
     for t in types:
+        while isinstance(t, C.TOptional):
+            flat.append(C.TName("nothing"))
+            t = t.type
         flat.extend(t.types if isinstance(t, C.TUnion) else [t])
     is_nothing = [isinstance(t, C.TName) and t.ref == "nothing" for t in flat]
     rest = [t for t, n in zip(flat, is_nothing) if not n]

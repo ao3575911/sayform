@@ -1,0 +1,16 @@
+module algebra-demo
+edition 0
+needs console
+
+
+ruleset algebra:
+    rewrite ?a + 0 as ?a
+    rewrite ?a * 1 as ?a
+    rewrite ?a * 0 as 0
+
+
+to main, needs console:
+    let e be quote (x * (y + 0) * 1)
+    show simplify e using algebra
+    let proven be (quote (x + 0)) is equivalent to quote (x) using algebra
+    show proven
