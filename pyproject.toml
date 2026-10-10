@@ -33,6 +33,9 @@ Specification = "https://github.com/ao3575911/sayform/blob/main/spec/00-README.m
 [tool.hatch.build.targets.wheel]
 packages = ["src/sayform"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"prelude" = "sayform/prelude"
+
 [tool.hatch.build.targets.sdist]
 include = ["src", "prelude", "spec", "tests", "tools", "conformance", "examples", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]
 

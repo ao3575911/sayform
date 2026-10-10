@@ -292,7 +292,7 @@ class Printer:
         fn = n.fn
         name = fn.name if isinstance(fn, C.Name) and fn.ref.kind in ("builtin", "def") else None
         a = n.args
-        if name is not None and not (name in self.defs and name not in BUILTIN_NAMES and fn.ref.kind == "def"):
+        if name is not None and fn.ref.kind == "builtin":
             res = self.operator(name, n, a, cond)
             if res is not None:
                 return res
@@ -561,9 +561,9 @@ class Printer:
         if isinstance(t, C.TAnything):
             return "anything"
         if isinstance(t, C.TOptional):
-            return f"{self.ty_w(t.type, art)} or nothing"
+            return f"{self.member(t.type, art)} or nothing"
         if isinstance(t, C.TUnion):
-            return " or ".join(self.ty_w(x, art) for x in t.types)
+            return " or ".join(self.member(x, art) for x in t.types)
         if isinstance(t, C.TApply):
             if t.head == "map":
                 return a(f"map from {self.pl(t.args[0])} to {self.pl(t.args[1])}")
@@ -573,6 +573,10 @@ class Printer:
             eff = f", needs {self.effects(t.effects)}" if t.effects else ""
             return a(f"function from {ps} to {self.ty_w(t.result)}{eff}")
         return "anything"
+
+    def member(self, t: Any, art: bool) -> str:
+        """A union member; a type variable takes an article there (`a T or nothing`)."""
+        return f"{article(t.name)} {t.name}" if isinstance(t, C.TVar) and art else self.ty_w(t, art)
 
     def pl(self, t: Any) -> str:
         if isinstance(t, C.TName):
@@ -1055,3 +1059,8 @@ def print_expr(e: Any, surface: str = "symbols") -> str:
     p = Printer(surface)
     p.quote = 1
     return p.ex(e)
+
+
+def expr_text(e: Any) -> str:
+    """An Expression or type in the canonical ASCII symbols surface (used by `display`)."""
+    return print_expr(e, "symbols")

@@ -2354,10 +2354,14 @@ class Parser:
     # ---- patterns (spec 03 section 5.6, ebnf section 10) ---------------------------------
     def pattern(self, mode: str) -> tuple[Any, list[str]]:
         names: list[str] = []
+        line = self.cur.line
         alts = [self.single(mode, names)]
         while self.at("or") and "or" not in self.stop:
             self.adv()
-            alts.append(self.single(mode, names))
+            more: list[str] = []
+            alts.append(self.single(mode, more))
+            if set(more) != set(names):
+                raise SayError("E0904", line, names=", ".join(sorted(set(more) ^ set(names))))
         if len(alts) == 1:
             return alts[0], names
         return C.PAlt(tuple(alts)), names

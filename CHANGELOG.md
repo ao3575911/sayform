@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M4: values and evaluator (`values.py`, `evaluator.py`, `builtins.py`): exact numbers
+  (Integer/Decimal/Rational normalisation, scale rules, `//`, `mod`, `^`), approx contagion,
+  text by grapheme clusters, records/variants with defaults, invariants and copy-with,
+  1-based collections, generator-based evaluation, closures by reference, patterns,
+  problems/`try`/`or else`, panics with 5-part output, multiple dispatch with most-specific
+  choice and SAY-E0402, call depth limit. `say run` with exit codes 0/1/2/4/70.
+  The 21-function prelude in Sayform (`prelude/prelude.say`), shipped in the wheel.
+  Tests: `NUM`, `TXT`, `REC`, `COL`, `SEM`, `PAT`, `ERRV`, `DSP` rows in `tests/test_semantics.py`.
 - M3: canonical printers for both surfaces (`src/sayform/printer.py`), SCS-1 canonical
   serialisation and BLAKE3 core hashes with SCC handling (`src/sayform/scs.py`),
   `say fmt [--words|--symbols] [--check]`, `say core [--json]`, `say hash [--defs]`.
@@ -15,6 +23,11 @@ All notable changes to this project are documented here. The format follows
   `HASH-01`...`HASH-12` (byte vectors in `conformance/hash/vectors.toml`), G-01 prints.
 
 ### Spec gaps (decided provisionally, flagged)
+- `add 1 to n` / `n += 1` on a number adds (12-stdlib defines `added` only for collections).
+- `display` of a Symbol is `'name`; of a function value `function NAME`.
+- `main` returning a problem prints `problem[KIND]` with what/why/try (no registry code exists).
+- `empty-set` is provided by the host: no Sayform expression builds an empty set.
+- Grapheme clusters follow UAX #29 rules over Python's `unicodedata` tables (15.0 on 3.12, 15.1 on 3.13).
 - `Nothing` joins `Set` as an exemption from SAY-E0103 (issue #3).
 - SCS-1: interpolation text parts and quantity numbers carry a one-byte kind marker.
 - Words-surface parameter, result and field types also accept a symbols type, so types
