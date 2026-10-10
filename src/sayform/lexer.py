@@ -8,6 +8,7 @@ trivia in `Lexed.comments`.
 
 from __future__ import annotations
 
+import re
 import unicodedata
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -516,6 +517,11 @@ class Lexer:
                 self.add("DUR", (self.numval(intpart, frac), TIME_UNITS[suffix]), st, spaced, raw=s[st:k])
                 return
             raise self.err("E0135", text=s[st:k], suggested=text)
+        m = re.match(r" +(milliseconds?|seconds?|minutes?)(?![\w-])", s[j:])
+        if m:
+            self.i = j + m.end()
+            self.add("DUR", (self.numval(intpart, frac), TIME_UNITS[m.group(1)]), st, spaced, raw=s[st : self.i])
+            return
         self.add("DEC" if frac else "INT", self.numval(intpart, frac), st, spaced, raw=text)
 
     @staticmethod
