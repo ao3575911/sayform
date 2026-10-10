@@ -513,10 +513,13 @@ class Evaluator:
         new = Env(dict(f.env.cells) if f.env else {}, caps, f if isinstance(node, C.Func) else env.func)
         pos = iter(args)
         idx = f.idx or self.lambda_indices(f)
+        extra = len(args) - len(f.positional)  # builtin lowering passes slot arguments in order
         for p, i in zip(f.params, idx, strict=True):
             key = p.name if p.slot == "with" else p.slot
             if p.slot in (None, "of"):
                 v = next(pos, StopIteration)
+            elif extra > 0 and p.slot != "with" and key not in kw:
+                v, extra = next(pos, StopIteration), extra - 1
             else:
                 v = kw.pop(key, StopIteration) if key else StopIteration
             if v is StopIteration:
@@ -795,3 +798,70 @@ def program(
         caps[e.effect] = Capability(e.effect, backing=backing)
     env = Env(caps=caps)
     return ev, ev.run(ev.apply(main, [], {}, env))
+
+
+@dataclass
+class CheckResult:
+    label: str
+    line: int
+    ok: bool
+    expected: str = ""
+    actual: str = ""
+    error: Any = None
+
+
+def run_checks(mod: C.Module, write: Any = None, seed: int = 0, allow: tuple[str, ...] = ()) -> list[CheckResult]:
+    """Run a module's top-level checks (spec 13 section 5) with test capabilities: a captured
+    console, virtual clock and tasks, seeded random; other effects only when allowed."""
+    from .checker import check_module
+
+    check_module(mod)
+    if not _PRELUDE:
+        _PRELUDE.append(prelude_module())
+    ev = Evaluator(write or (lambda text, end="\n": None))
+    ev.globals["empty-set"] = SetV(())
+    ev.rng.seed(seed)
+    ev.clock = Decimal(0)
+    ev.run(ev.load(_PRELUDE[0]))
+    ev.run(ev.load(mod))
+    caps = {e: Capability(e) for e in ("console", "clock", "random", "tasks", *allow)}
+    results: list[CheckResult] = []
+    for d in mod.body:
+        if isinstance(d, C.Check):
+            ev.run(check_one(ev, d, Env(caps=caps), results, d.label or ""))
+    return results
+
+
+def check_one(ev: Evaluator, n: C.Check, env: Env, out: list[CheckResult], label: str) -> Gen:
+    if n.body is not None:
+        for st in n.body.stmts:
+            if isinstance(st, C.Check):
+                yield from check_one(ev, st, env, out, n.label or label)
+            else:
+                try:
+                    yield from ev.ev(st, env)
+                except SayError as e:
+                    out.append(CheckResult(n.label or label, st.line, False, error=e))
+                    return
+        return
+    try:
+        got = yield from ev.ev(n.subject, env)
+        if n.relation == "equals":
+            want = yield from ev.ev(n.expected, env)
+            ok, exp = equal(got, want), display(want, True)
+        elif n.relation == "fails-with":
+            want = n.expected.name
+            ok, exp = isinstance(got, Problem) and got.kind.name == want, f"problem {want}"
+        elif n.relation == "is":
+            t = n.expected.type if isinstance(n.expected, C.TypeExpr) else n.expected
+            ok, exp = type_test(got, t), display(TypeV(t))
+        elif n.relation == "matches":
+            from .symbolic import match_expr  # type: ignore[import-untyped, unused-ignore]
+
+            pat = yield from ev.ev(n.expected, env)
+            ok, exp = match_expr(pat.node, got.node) is not None, display(pat)
+        else:
+            ok, exp = got is True, "yes"
+        out.append(CheckResult(label, n.line, ok, exp, display(got, True)))
+    except SayError as e:
+        out.append(CheckResult(label, n.line, False, error=e))

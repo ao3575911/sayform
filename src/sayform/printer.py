@@ -857,10 +857,10 @@ class Printer:
         w = self.w
         if s.body is not None:
             return [f'{pad}check "{escape_text(s.label or "")}":'] + self.block(s.body, ind + 4)
-        subj = self.ex(s.subject, 7)
+        subj = self.closed(s.subject, 7)
         lead = "check that " if w else "check "
         if s.relation == "equals":
-            return [f"{pad}{lead}{subj} {'equals' if w else '='} {self.ex(s.expected, 7)}"]
+            return [f"{pad}{lead}{subj} {'equals' if w else '='} {self.closed(s.expected, 7)}"]
         if s.relation == "fails-with" and isinstance(s.expected, C.SymLit):
             return [f"{pad}{lead}{self.ex(s.subject, 2)} {'fails with' if w else 'fails'} {s.expected.name}"]
         if s.relation == "matches" and isinstance(s.expected, C.Quote):

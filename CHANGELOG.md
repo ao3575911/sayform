@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M6: standard library rows: `LIB-<name>` tests for the core, console, number, text and
+  collection host primitives (normal cases and their panics), top-level check execution
+  (`run_checks`, captured console, virtual clock, seeded random), and `prelude/prelude.test.say`
+  exercising all 21 Sayform prelude functions (`LIB-PRELUDE-SAY`, G-14). Calls that lower
+  slot arguments positionally (`join_all(xs, ", ")`) bind them to slot parameters in order.
 - M5: effects and capabilities: static effect checks before a run (`checker.py`, SAY-E0501,
   SAY-E0601, module header coverage, top-level `let`), capability context with narrowing on
   calls and `with … limited to …[, read only]` (SAY-E0504 on widening), revocation at block exit
