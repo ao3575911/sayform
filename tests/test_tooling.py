@@ -298,10 +298,7 @@ def test_test_01_to_05_line_forms() -> None:
 def test_test_06_block_form() -> None:
     assert checks(
         'edition 0\n\ncheck "b":\n    let x be 2\n    check that x equals 2\n    check that x equals 3\n'
-    ) == [
-        True,
-        False,
-    ]
+    ) == [True, False]
 
 
 def test_test_07_note_examples_run() -> None:
@@ -342,8 +339,7 @@ def test_err_codes(code: str) -> None:
 
 
 @pytest.mark.parametrize(
-    ("code", "src"),
-    [("E0702", "needs console\nedition 0\n"), ("E0706", "edition 0\ndialect bogus\n")],
+    ("code", "src"), [("E0702", "needs console\nedition 0\n"), ("E0706", "edition 0\ndialect bogus\n")]
 )
 def test_err_header_codes(code: str, src: str) -> None:
     assert run_source(src).code == f"SAY-{code}"

@@ -6,6 +6,31 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-10-10
+
+### Added
+- Issue #14: the remaining reachable spec error codes are now emitted, with tests in
+  `tests/test_errors.py`. Static checks (checker): `=` as a statement SAY-E0111; `and`/`or`/`not`
+  on a literal non-Truth SAY-E0112; non-Truth `if`/`while` conditions and text-vs-number ordering
+  SAY-E0201; time quantity mixed with a plain number SAY-E0203; orphan methods on host/prelude
+  generics SAY-E0403; call shape against a known signature (unknown slot SAY-E0408, missing
+  argument SAY-E0409, too many or repeated arguments SAY-E0410); duplicate literal map keys and
+  set items SAY-E0821; discarding a `may fail` result SAY-W0201 (reported by `say check`).
+  Parser: `operator` declarations outside a dialect SAY-E0704; a dialect named twice in the
+  header SAY-E0705; `edition N` other than 0 SAY-E1011. SAY-E0404 (already emitted by the module
+  linker) gains a test.
+
+### Changed
+- Literal-operand cases that used to fail at runtime with SAY-E0212 are now caught statically
+  (SAY-E0112 / SAY-E0201); SAY-E0212 remains the runtime error for non-literal operands.
+- Compaction to stay inside the 8,000-line interpreter budget: `ruff format` now uses
+  `skip-magic-trailing-comma`, collapsing exploded calls (7,960 → 7,807 lines before the new
+  checks; 7,890 after).
+
+### Known gaps
+- SAY-E0204 (currency mismatch) cannot be reached in v0: money values exist only in the v0.1
+  `money` dialect, which v0 rejects with SAY-E1013.
+
 ## [0.0.1] - 2026-10-10
 
 ### Added

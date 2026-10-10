@@ -30,15 +30,7 @@ WORDS_OF = {
     "modulo": "mod",
     "power": "to the power of",
 }
-CMP_SYM = {
-    "=": "equal",
-    "==": "equal",
-    "<": "less",
-    "<=": "less-eq",
-    ">": "greater",
-    ">=": "greater-eq",
-    "===": "same",
-}
+CMP_SYM = {"=": "equal", "==": "equal", "<": "less", "<=": "less-eq", ">": "greater", ">=": "greater-eq", "===": "same"}
 CMP_WORDS = {
     "less": "is less than",
     "less-eq": "is at most",
@@ -47,14 +39,7 @@ CMP_WORDS = {
     "equal": "equals",
     "same": "is the same as",
 }
-CMP_SYM_OUT = {
-    "equal": "=",
-    "less": "<",
-    "less-eq": "<=",
-    "greater": ">",
-    "greater-eq": ">=",
-    "same": "===",
-}
+CMP_SYM_OUT = {"equal": "=", "less": "<", "less-eq": "<=", "greater": ">", "greater-eq": ">=", "same": "==="}
 CLAUSE_FNS = frozenset({"filter", "map", "sort", "sort-by", "group-by", "join", "join-all"})
 
 #: Precedence ladder P0-P15 (spec 03 section 3); P13 is reserved.
@@ -97,12 +82,7 @@ HOST_SIGS: dict[str, list[tuple[str | None, str, bool]]] = {
     "code-points": [("of", "t", False)],
     "utf8-bytes": [("of", "t", False)],
     "parse-number": [(P, "t", False)],
-    "range": [
-        (P, "a", False),
-        (P, "b", False),
-        ("with", "exclusive", True),
-        ("with", "step", True),
-    ],
+    "range": [(P, "a", False), (P, "b", False), ("with", "exclusive", True), ("with", "step", True)],
     "added": [(P, "c", False), (P, "item", False)],
     "count": [("of", "c", False)],
     "sort-by": [("of", "c", False), (P, "key", False), ("with", "descending", True)],
@@ -111,12 +91,7 @@ HOST_SIGS: dict[str, list[tuple[str | None, str, bool]]] = {
     "values": [("of", "m", False)],
     "evaluate": [("of", "e", False), ("with", "bindings", True)],
     "match": [(P, "e", False), (P, "pattern", False)],
-    "egraph-simplify": [
-        (P, "e", False),
-        (P, "rules", False),
-        ("with", "nodes", True),
-        ("with", "steps", True),
-    ],
+    "egraph-simplify": [(P, "e", False), (P, "rules", False), ("with", "nodes", True), ("with", "steps", True)],
     "egraph-equiv": [(P, "a", False), (P, "b", False), (P, "rules", False)],
     "head": [("of", "e", False)],
     "arguments": [("of", "e", False)],

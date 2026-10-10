@@ -60,13 +60,13 @@ def test_lib(name: str, lines: list[str], expected: list[str]) -> None:
 
 
 LIB_ERR = [
-    ("not", "show (not 1)", "SAY-E0212"),
+    ("not", "let n be 1\nshow (not n)", "SAY-E0212"),
     ("problem", 'show problem("x")', "SAY-E0212"),
     ("add", 'show ("a" + 1)', "SAY-E0202"),
     ("divide", "show (1 / 0)", "SAY-E0841"),
     ("modulo", "show (1 mod 0)", "SAY-E0841"),
     ("power", "show ((negative 1) ^ 0.5)", "SAY-E0842"),
-    ("less", 'show ("a" is less than 1)', "SAY-E0212"),
+    ("less", 'let n be 1\nshow ("a" is less than n)', "SAY-E0212"),
     ("round", "show round 1 with mode 'up", "SAY-E0212"),
     ("length", "show length of 1", "SAY-E0212"),
     ("join", 'show ("a" joined with 1)', "SAY-E0202"),

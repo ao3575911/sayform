@@ -126,11 +126,7 @@ def test_grm_12_in_is_membership_without_units() -> None:
 
 
 def test_grm_13_implicit_it_field_and_clash() -> None:
-    v = value_of(
-        "people where age is at least 18",
-        PEOPLE,
-        'let people be [Person with name "Ada" and age 36]\n',
-    )
+    v = value_of("people where age is at least 18", PEOPLE, 'let people be [Person with name "Ada" and age 36]\n')
     lam = v.args[1]  # type: ignore[attr-defined]
     assert isinstance(lam.body.args[0], C.Get) and lam.body.args[0].field == "age"
     pre = 'let age be 3\nlet people be [Person with name "Ada" and age 36]\n'
@@ -264,8 +260,7 @@ def test_lex_20_reserved_word_as_name(word: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "word",
-    [w for w in __import__("sayform.keywords").keywords.CONTEXTUAL if w not in ("anything", "Self")],
+    "word", [w for w in __import__("sayform.keywords").keywords.CONTEXTUAL if w not in ("anything", "Self")]
 )
 def test_lex_21_contextual_word_as_name(word: str) -> None:
     sink = Sink()

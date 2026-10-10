@@ -121,10 +121,10 @@ ERR = [
     ("TXT-11", 'let n be 1\nshow "a" joined with n', "SAY-E0202", 70),
     ("REC-10", "let p be Person with age 3\nshow p", "SAY-E0211", 2),
     ("REC-11", "let c be dot\nchange the value of c to 2", "SAY-E0303", 2),
-    ("SEM-20", "if 1:\n    show 1", "SAY-E0212", 70),
+    ("SEM-20", "let n be 1\nif n:\n    show 1", "SAY-E0212", 70),
     ("SEM-21", "let x be 1\nshow not x", "SAY-E0212", 70),
     ("PAT-10", "match 7:\n    when 1:\n        show 1", "SAY-E0212", 70),
-    ("ERRV-05", "show (1 or 2)", "SAY-E0212", 70),
+    ("ERRV-05", "let n be 1\nlet m be 2\nshow (n or m)", "SAY-E0212", 70),
 ]
 
 

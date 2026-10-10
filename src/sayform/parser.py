@@ -77,19 +77,7 @@ SYM_TYPES = {
 }
 SYM_HEADS = {"List": "list", "Set": "set", "Map": "map", "Channel": "channel"}
 OPWORDS = {"plus", "minus", "times", "divided", "mod", "joined", "sorted", "grouped", "matches"}
-VALUE_RESERVED = {
-    "the",
-    "quote",
-    "given",
-    "yes",
-    "no",
-    "true",
-    "false",
-    "nothing",
-    "try",
-    "evaluate",
-    "simplify",
-}
+VALUE_RESERVED = {"the", "quote", "given", "yes", "no", "true", "false", "nothing", "try", "evaluate", "simplify"}
 V01_DIALECTS = {"money", "units", "ieee", "quick-script"}
 
 
@@ -184,20 +172,10 @@ class Parser:
             return "indentation"
         return str(tok.raw or tok.value)
 
-    def fail(
-        self,
-        expected: str,
-        hint: str = "check the line against the grammar",
-        tok: Tok | None = None,
-    ) -> SayError:
+    def fail(self, expected: str, hint: str = "check the line against the grammar", tok: Tok | None = None) -> SayError:
         tok = tok or self.cur
         return SayError(
-            "E0130",
-            tok.line,
-            tok.col,
-            token=self.describe(tok),
-            expected=expected,
-            try_=f"expected {expected}; {hint}",
+            "E0130", tok.line, tok.col, token=self.describe(tok), expected=expected, try_=f"expected {expected}; {hint}"
         )
 
     def expect(self, word: str) -> Tok:
@@ -246,13 +224,7 @@ class Parser:
             self.sink.warn("W0114", line, word=name)
         sc = self.scopes[-1]
         if name in sc.names and check:
-            raise SayError(
-                "E0301",
-                line,
-                name=name,
-                at_line=line,
-                what=f"`{name}` is already bound in this block.",
-            )
+            raise SayError("E0301", line, name=name, at_line=line, what=f"`{name}` is already bound in this block.")
         idx = self.counter
         self.counter += 1
         sc.names[name] = (idx, mutable)
@@ -287,13 +259,7 @@ class Parser:
             if loc is not None and loc[2] < it_depth and name in self.fields_known:
                 r1, r2 = f"the local `{name}`", f"the field `{name}` of `it`"
                 raise SayError(
-                    "E0108",
-                    line,
-                    readings=[r1, r2],
-                    reading1=r1,
-                    reading2=r2,
-                    symbols1=name,
-                    symbols2=f"it.{name}",
+                    "E0108", line, readings=[r1, r2], reading1=r1, reading2=r2, symbols1=name, symbols2=f"it.{name}"
                 )
         return C.Name(name, self.ref_for(name), line=line)
 
@@ -416,6 +382,8 @@ class Parser:
                 name = self.qname()
             elif kind == "edition":
                 edition = int(self.adv().value)
+                if edition != 0:
+                    raise SayError("E1011", tok.line, tok.col, construct=f"edition {edition}", n=0, m=0)
             elif kind == "use":
                 uses.append(self.use_line(tok))
             elif kind == "needs":
@@ -425,14 +393,11 @@ class Parser:
                 while self.eat_op(","):
                     ds.append(self.qname())
                 for d in ds:
+                    if ds.count(d) > 1:
+                        raise SayError("E0705", tok.line, tok.col, word=d, a=d, b=d)
                     if d in V01_DIALECTS:
                         raise SayError(
-                            "E1013",
-                            tok.line,
-                            tok.col,
-                            construct=f"dialect `{d}`",
-                            profile="v0.1",
-                            version="v0",
+                            "E1013", tok.line, tok.col, construct=f"dialect `{d}`", profile="v0.1", version="v0"
                         )
                     if d != "strict":
                         raise SayError("E0706", tok.line, tok.col, d=d, list="strict")
@@ -465,15 +430,7 @@ class Parser:
             body.append(item)
         for note in pending:
             trivia.append((len(body), "note", note))
-        mod = C.Module(
-            name,
-            edition,
-            tuple(sorted(uses, key=lambda u: u.path)),
-            needs,
-            dialects,
-            tuple(body),
-            line=1,
-        )
+        mod = C.Module(name, edition, tuple(sorted(uses, key=lambda u: u.path)), needs, dialects, tuple(body), line=1)
         mod = finish(mod, self.sigs)
         return replace(mod, trivia=tuple(trivia), has_header=has_header)
 
@@ -493,12 +450,7 @@ class Parser:
     def use_line(self, tok: Tok) -> C.Use:
         if self.at("python", "c", "wasm"):
             raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"`use {self.cur.value}`",
-                profile="v0.1",
-                version="v0",
+                "E1013", tok.line, tok.col, construct=f"`use {self.cur.value}`", profile="v0.1", version="v0"
             )
         path = self.qname()
         names: tuple[str, ...] | None = None
@@ -539,12 +491,7 @@ class Parser:
         eff = self.word("an effect name")
         if eff not in EFFECTS:
             raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"the user effect `{eff}`",
-                profile="v0.1",
-                version="v0",
+                "E1013", tok.line, tok.col, construct=f"the user effect `{eff}`", profile="v0.1", version="v0"
             )
         narrow: list[C.Narrow] = []
         if self.at("limited") and self.nxt().is_word("to"):
@@ -583,16 +530,11 @@ class Parser:
             st = self.let_stmt(top=True)
             self.end_line()
             return st
+        if v == "operator" and self.nxt().kind == "NAME":
+            raise SayError("E0704", tok.line, tok.col, construct="operator", d="(none)")
         if v in ("role", "effect", "dialect") or (tok.kind == "NAME" and self.nxt().is_word("plays")):
             what = "plays" if self.nxt().is_word("plays") else v
-            raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"`{what}` declarations",
-                profile="v0.1",
-                version="v0",
-            )
+            raise SayError("E1013", tok.line, tok.col, construct=f"`{what}` declarations", profile="v0.1", version="v0")
         if v == "rewrite" or (v is None and self.line_has_op("=>")):
             raise SayError(
                 "E0903",
@@ -668,12 +610,7 @@ class Parser:
                     )
             elif self.at("explained"):
                 raise SayError(
-                    "E1013",
-                    self.cur.line,
-                    self.cur.col,
-                    construct="`explained as`",
-                    profile="v0.1",
-                    version="v0",
+                    "E1013", self.cur.line, self.cur.col, construct="`explained as`", profile="v0.1", version="v0"
                 )
             else:
                 raise self.fail("`needs`, `may fail with` or `for any`")
@@ -779,14 +716,7 @@ class Parser:
         self.in_func = False
         self.sigs[name] = [(p_.slot, p_.name, p_.default is not None) for p_ in params]
         return C.Func(
-            name,
-            tuple(params),
-            result,
-            effects,
-            tuple(sorted(set(fails))),
-            tuple(generics),
-            body,
-            line=tok.line,
+            name, tuple(params), result, effects, tuple(sorted(set(fails))), tuple(generics), body, line=tok.line
         )
 
     def data_w(self) -> Any:
@@ -951,13 +881,7 @@ class Parser:
 
     def cases(self, tvs: set[str]) -> list[C.CaseDef]:
         if self.cur.kind != "INDENT":
-            raise SayError(
-                "E0131",
-                self.cur.line,
-                1,
-                what="A variant needs at least one case.",
-                opener="is one of:",
-            )
+            raise SayError("E0131", self.cur.line, 1, what="A variant needs at least one case.", opener="is one of:")
         self.adv()
         cases: list[C.CaseDef] = []
         seen: set[str] = set()
@@ -1245,12 +1169,7 @@ class Parser:
         eff = self.word("an effect name")
         if eff not in EFFECTS:
             raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"the user effect `{eff}`",
-                profile="v0.1",
-                version="v0",
+                "E1013", tok.line, tok.col, construct=f"the user effect `{eff}`", profile="v0.1", version="v0"
             )
         self.adv()
         self.expect("to")
@@ -1297,13 +1216,7 @@ class Parser:
             value = self.expr()
         if not mutable and self.at_op(",") and self.nxt().is_word("changeable"):
             if top:
-                raise SayError(
-                    "E0130",
-                    tok.line,
-                    tok.col,
-                    token="changeable",
-                    try_="top-level bindings are immutable",
-                )
+                raise SayError("E0130", tok.line, tok.col, token="changeable", try_="top-level bindings are immutable")
             self.adv()
             self.adv()
             mutable = True
@@ -1814,11 +1727,7 @@ class Parser:
             else:
                 if tok.is_op(",") and self.nxt().is_word("rounded"):
                     raise SayError(
-                        "E0130",
-                        tok.line,
-                        tok.col,
-                        token="rounded",
-                        try_="`, rounded down` follows `divided by …`",
+                        "E0130", tok.line, tok.col, token="rounded", try_="`, rounded down` follows `divided by …`"
                     )
                 return left
 
@@ -1928,14 +1837,7 @@ class Parser:
         r1 = f"({callee} {arg}) {op} {rest}"
         r2 = f"{callee} ({arg} {op} {rest})"
         raise SayError(
-            "E0108",
-            nxt.line,
-            nxt.col,
-            readings=[r1, r2],
-            reading1=r1,
-            reading2=r2,
-            symbols1=r1,
-            symbols2=r2,
+            "E0108", nxt.line, nxt.col, readings=[r1, r2], reading1=r1, reading2=r2, symbols1=r1, symbols2=r2
         )
 
     def slot_args(self, slots: list[tuple[str, Any]]) -> None:
@@ -2545,14 +2447,7 @@ class Parser:
         if v == "function":
             return self.func_type_w()
         if v in ("money", "quantity"):
-            raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"the `{v}` type",
-                profile="v0.1",
-                version="v0",
-            )
+            raise SayError("E1013", tok.line, tok.col, construct=f"the `{v}` type", profile="v0.1", version="v0")
         if v[:1].isupper():
             self.adv()
             return C.TName(v)
@@ -2638,14 +2533,7 @@ class Parser:
         elif v == "Anything":
             t = C.TAnything()
         elif v in ("Money", "Quantity"):
-            raise SayError(
-                "E1013",
-                tok.line,
-                tok.col,
-                construct=f"the `{v}` type",
-                profile="v0.1",
-                version="v0",
-            )
+            raise SayError("E1013", tok.line, tok.col, construct=f"the `{v}` type", profile="v0.1", version="v0")
         else:
             t = C.TName(SYM_TYPES.get(v, v))
         if self.at_op("?") and not self.cur.spaced:
