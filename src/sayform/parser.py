@@ -2425,6 +2425,9 @@ class Parser:
             self.eat("quote")
             q = self.quoted_pattern(self.quote_body)
             inner = q.expr.expr if isinstance(q.expr, C.Quote) else q.expr
+            for x in C.walk(inner):
+                if isinstance(x, C.Name) and x.ref.kind == "patvar" and x.name not in names:
+                    names.append(x.name)
             return C.PQuote(inner)
         if tok.is_op("("):
             self.adv()
@@ -2707,6 +2710,14 @@ def bind_refs(p: Any, refs: dict[str, C.Ref]) -> Any:
         return C.PList(tuple(bind_refs(x, refs) for x in p.prefix), rest)
     if isinstance(p, C.PAlt):
         return C.PAlt(tuple(bind_refs(x, refs) for x in p.alts))
+    if isinstance(p, C.PQuote):
+
+        def local(n: Any) -> Any:
+            if isinstance(n, C.Name) and n.ref.kind == "patvar" and n.name in refs:
+                return replace(n, ref=C.Ref("patvar", refs[n.name].value))
+            return n
+
+        return C.PQuote(transform(p.expr, local))
     return p
 
 

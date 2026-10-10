@@ -52,6 +52,11 @@ class Env:
     cells: dict[int, Cell] = field(default_factory=dict)
     caps: dict[str, Any] = field(default_factory=dict)
     func: Any = None
+    free: dict[str, Any] | None = None  # `evaluate` bindings (spec 08 section 4)
+
+
+class NotFound(Exception):
+    """An unbound symbol inside `evaluate` (becomes problem `not-found`)."""
 
 
 class Capability:
@@ -220,8 +225,14 @@ class Evaluator:
         }
         self.lam_idx: dict[int, tuple[int, ...]] = {}
         self.read: Any = lambda: None
+        self.warnings: list[Any] = []
         self.rng = random.Random()
         self.clock: Decimal | None = None
+
+    def warn(self, code: str, **params: Any) -> None:
+        from .diagnostics import make
+
+        self.warnings.append(make(code, 0, 0, severity="warning", **params))
 
     # ---- loading -------------------------------------------------------------------------
     def load(self, mod: C.Module) -> Gen:
@@ -230,6 +241,10 @@ class Evaluator:
                 self.define(d)
             elif isinstance(d, C.RecordDef):
                 self.types[d.name] = RecordType(d)
+            elif isinstance(d, C.Ruleset):
+                from .symbolic import RulesetV
+
+                self.globals[d.name] = RulesetV(d.name, d.rules)
             elif isinstance(d, C.VariantDef):
                 self.variants[d.name] = {c.name for c in d.cases}
                 for c in d.cases:
@@ -405,6 +420,11 @@ class Evaluator:
 
     def lookup(self, n: C.Name, env: Env) -> Any:
         r = n.ref
+        if r.kind == "free" and env.free is not None:
+            key = r.value.replace("_", "-")
+            if key not in env.free:
+                raise NotFound(n.name)
+            return env.free[key]
         if r.kind == "local":
             cell = env.cells.get(r.value)
             if cell is None:
@@ -455,6 +475,8 @@ class Evaluator:
     def apply(self, f: Any, args: list[Any], kw: dict[str, Any], env: Env, node: Any = None) -> Gen:
         if isinstance(f, Builtin):
             if f.needs and f.needs not in env.caps:
+                if env.free is not None:
+                    raise panic("E0503", effect=f.needs)
                 raise panic("E0502", effect=f.needs, reason="the host did not grant it")
             kw = {SAFE.get(k, k).replace("-", "_"): v for k, v in kw.items()}
             if f.gen:
@@ -706,10 +728,9 @@ class Evaluator:
             got = match_expr(p.expr, v.node if isinstance(v, ExprV) else value_node(v))
             if got is None:
                 return False
-            for name, sub in got.items():
-                for x in C.walk(p.expr):
-                    if isinstance(x, C.PBind) and x.name == name and x.ref is not None:
-                        env.cells[x.ref.value] = Cell(ExprV(sub))
+            for x in C.walk(p.expr):
+                if isinstance(x, C.Name) and x.ref.kind == "patvar" and x.name in got:
+                    env.cells[x.ref.value] = Cell(ExprV(got[x.name]))
             return True
         return False
 

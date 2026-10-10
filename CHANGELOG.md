@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M7: symbolic core (`symbolic.py`): structural matching with repeated pattern variables,
+  rulesets as values, the pure `simplify` fallback (bottom-up passes to a fixpoint, cost = node
+  count, SCS-1 tie-break, budget → SAY-W0912 and best-so-far), `is equivalent to` (yes / no /
+  nothing), `matches`, `quote`/`~` splicing, `evaluate` with bindings under the caller's
+  capabilities (SAY-E0503, problem `not-found`), `head of` / `arguments of`, and quote patterns
+  in `match` binding their variables. Tests `SYM-01`…`SYM-23`, G-08.
 - M6: standard library rows: `LIB-<name>` tests for the core, console, number, text and
   collection host primitives (normal cases and their panics), top-level check execution
   (`run_checks`, captured console, virtual clock, seeded random), and `prelude/prelude.test.say`
