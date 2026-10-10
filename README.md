@@ -22,7 +22,7 @@ Work ships milestone by milestone (build plan, section 6). Checked items are mer
 | M3 | Core AST, lowering, printers, `say fmt`, `say core`, SCS-1, `say hash` | done (round-trip laws, `LOW`, `HASH-01`…`HASH-12`) |
 | M4 | Values and evaluator | done (`NUM`, `TXT`, `REC`, `COL`, `SEM`, `PAT`, `ERRV`, `DSP` rows) |
 | M5 | Effects, capability context, host policy | done (`CAP-*` except test-runner, tasks and REPL rows, which land with M8/M9) |
-| M6 | 53 host primitives and the 21-function prelude | not started |
+| M6 | 53 host primitives and the 21-function prelude | done for core/console/numbers/text/collections/host modules + 21-function prelude (`LIB-*`, G-14); symbolic and task primitives land with M7/M8 |
 | M7 | Symbolic: quote, `evaluate`, rulesets, `simplify` | not started |
 | M8 | Concurrency: `together`, `all of`, `first of`, `within`, channels | not started |
 | M9 | Tooling: `say run/check/test/explain`, REPL, diagnostics | not started |

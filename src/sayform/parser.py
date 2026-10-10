@@ -576,7 +576,8 @@ class Parser:
             return self.ruleset()
         if v == "check":
             st = self.check_decl()
-            self.end_line()
+            if st.body is None:
+                self.end_line()
             return st
         if v == "let":
             st = self.let_stmt(top=True)
