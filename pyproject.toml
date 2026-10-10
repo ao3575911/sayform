@@ -37,7 +37,7 @@ packages = ["src/sayform"]
 include = ["src", "prelude", "spec", "tests", "tools", "conformance", "examples", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py312"
 extend-exclude = ["src/sayform/_unicode", "src/sayform/codes.py"]
 

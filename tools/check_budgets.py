@@ -36,9 +36,7 @@ V01_NODES = {"RoleDef", "Plays", "EffectDef", "OperatorDef"}
 
 
 def measure() -> dict[str, int]:
-    tagged = [
-        c for c in vars(core).values() if inspect.isclass(c) and issubclass(c, core.Node) and c.TAG
-    ]
+    tagged = [c for c in vars(core).values() if inspect.isclass(c) and issubclass(c, core.Node) and c.TAG]
     nodes = [c for c in tagged if c.TAG <= 44]
     lines = 0
     for p in (ROOT / "src" / "sayform").rglob("*.py"):
@@ -82,9 +80,7 @@ def main() -> int:
         limit = LIMITS[name]
         ok = value == limit if name in exact else value <= limit
         bad += not ok
-        print(
-            f"{'ok  ' if ok else 'FAIL'} {name}: {value} ({'=' if name in exact else '<='} {limit})"
-        )
+        print(f"{'ok  ' if ok else 'FAIL'} {name}: {value} ({'=' if name in exact else '<='} {limit})")
     return 1 if bad else 0
 
 

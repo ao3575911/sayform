@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M2: hand-written parser for both surfaces with direct lowering to the core
+  (`src/sayform/parser.py`), disambiguation rules R1-R20, SAY-E0108 with both readings,
+  `GRM-01`...`GRM-30` tests and the parser-level parts of `LEX-20`/`LEX-21`.
+- `tests/test_ebnf.py`: `spec/03-grammar.ebnf` is loaded with Lark to keep it well formed.
+- ADR 0001 (`docs/adr/0001-hand-written-parser.md`): why the parser is hand-written.
 - M0: project scaffold, Apache-2.0 licence, spec 0.1-lite imported into `spec/`,
   CI (lint, types, tests, budgets, spec sync, wheel smoke test), `say --version`,
   `tools/check_budgets.py`, `tools/check_spec_sync.py`, generated error registry.

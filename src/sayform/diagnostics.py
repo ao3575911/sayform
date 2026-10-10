@@ -100,9 +100,7 @@ def make(
     # Template placeholders that clash with the location arguments are passed as at_<name>.
     params = {(k[3:] if k.startswith("at_") else k): v for k, v in params.items()}
     if severity is None:
-        severity = {"E": "error", "W": "warning", "P": "panic", "H": "refused"}.get(
-            kind[0], "error"
-        )
+        severity = {"E": "error", "W": "warning", "P": "panic", "H": "refused"}.get(kind[0], "error")
         if kind == "E/P":
             severity = "error"
     return Diag(

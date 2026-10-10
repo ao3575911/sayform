@@ -138,6 +138,19 @@ PRELUDE_NAMES: tuple[str, ...] = (
     "is-empty", "reversed", "largest", "smallest",
 )  # fmt: skip
 PRELUDE_EXTRAS = ("Pair", "empty-set")
+#: Signatures of prelude functions that take slot or named arguments (spec 12 section 3).
+PRELUDE_SIGS: dict[str, list[tuple[str | None, str, bool]]] = {
+    "between": [
+        (P, "x", False),
+        (P, "lo", False),
+        (P, "hi", False),
+        ("with", "low-inclusive", True),
+        ("with", "high-inclusive", True),
+    ],
+    "checked-divide": [(P, "a", False), ("by", "b", False)],
+    "take": [(P, "n", False), ("from", "c", False)],
+    "drop": [(P, "n", False), ("from", "c", False)],
+}
 BUILTIN_NAMES = frozenset(HOST_SIGS) | frozenset(PRELUDE_NAMES) | frozenset(PRELUDE_EXTRAS)
 HOST_MODULES = frozenset({"files", "clock", "random"})
 BUILTIN_EFFECTS: dict[str, str] = {
@@ -157,9 +170,7 @@ def bname(name: str, line: int = 0) -> Name:
     return Name(name, Ref("builtin", name), line=line)
 
 
-def op_call(
-    fn: str, args: list[Any], line: int = 0, slots: tuple[tuple[str, Any], ...] = ()
-) -> Call:
+def op_call(fn: str, args: list[Any], line: int = 0, slots: tuple[tuple[str, Any], ...] = ()) -> Call:
     return Call(bname(fn, line), tuple(args), slots, line=line)
 
 
@@ -168,9 +179,4 @@ def thunk(e: Any) -> Lambda:
 
 
 def is_op(n: Any, *names: str) -> bool:
-    return (
-        isinstance(n, Call)
-        and isinstance(n.fn, Name)
-        and n.fn.ref.kind == "builtin"
-        and n.fn.name in names
-    )
+    return isinstance(n, Call) and isinstance(n.fn, Name) and n.fn.ref.kind == "builtin" and n.fn.name in names

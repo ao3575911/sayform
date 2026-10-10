@@ -47,9 +47,7 @@ def main() -> int:
             print(f"ok   {name}: {len(spec)} in sync")
             continue
         bad += 1
-        print(
-            f"FAIL {name}: missing in code {sorted(spec - code)}; not in spec {sorted(code - spec)}"
-        )
+        print(f"FAIL {name}: missing in code {sorted(spec - code)}; not in spec {sorted(code - spec)}")
     return 1 if bad else 0
 
 
