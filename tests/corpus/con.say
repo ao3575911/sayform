@@ -1,0 +1,38 @@
+edition 0
+needs console and tasks
+
+to delayed n d, needs tasks:
+    sleep for d
+    give back n
+
+to producer ch, needs console and tasks:
+    for each i in [1, 2, 3]:
+        show "send {i}"
+        send i into ch
+    close ch
+
+to main, needs console and tasks, may fail with not-found and several and timed-out:
+    together:
+        show "a"
+        show "b"
+    let xs be all of:
+        delayed(20, 2s)
+        delayed(10, 1s)
+    show xs
+    let r be all of:
+        p: delayed(10, 1s)
+        q: delayed(30, 3s)
+    show r
+    let w be first of:
+        delayed(30, 3s)
+        delayed(10, 1s)
+    show w
+    let ch be new-channel()
+    together:
+        producer(ch)
+        for each x received from ch:
+            show "got {x}"
+    show (each n in [3, 1, 2] at the same time, n * 2)
+    within 2 seconds:
+        sleep for 5 seconds
+        show "never"

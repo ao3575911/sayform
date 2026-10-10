@@ -119,7 +119,7 @@ def test_lex_17_triple_quote_dedent() -> None:
 def test_lex_18_durations() -> None:
     toks = kinds("wait 5 seconds\nwait 5s\nwait 200ms\nwait 2 min\n")
     assert ("DUR", (5, "s")) in toks and ("DUR", (200, "ms")) in toks
-    assert ("NAME", "seconds") in toks and ("NAME", "min") in toks
+    assert toks.count(("DUR", (5, "s"))) == 2 and ("NAME", "min") in toks  # spaced short suffix stays a name
 
 
 def test_lex_19_comments_kept() -> None:

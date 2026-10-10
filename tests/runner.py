@@ -18,6 +18,7 @@ class Result:
     code: str = ""
     what: str = ""
     value: object = None
+    trace: tuple[str, ...] = ()
 
 
 def run(body: str, header: str = "", needs: str = "console", stdin: list[str] | None = None) -> Result:
@@ -38,7 +39,7 @@ def run_source(src: str, stdin: list[str] | None = None) -> Result:
     try:
         _, value = big_stack(lambda: program(parse(src), write, lambda: lines.pop(0) if lines else None))
     except SayError as e:
-        return Result(out, EXIT[e.diag.severity], e.code, e.diag.what)
+        return Result(out, EXIT[e.diag.severity], e.code, e.diag.what, trace=tuple(e.diag.trace))
     return Result(out, 1 if isinstance(value, Problem) else 0, value=value)
 
 

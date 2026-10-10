@@ -47,7 +47,45 @@ def check_module(mod: C.Module, sink: Sink | None = None) -> None:
                 if effect == "tasks" and not via.startswith("`"):
                     raise SayError("E0601", line or d.line, construct=via)
                 raise SayError("E0501", line or d.line, fn=name, effect=effect, via=via)
+    for d in mod.body:
+        if isinstance(d, C.Func):
+            check_tasks(d, funcs)
     header = {e.effect for e in mod.needs}
     if mod.needs and union - header:
         missing = sorted(union - header)[0]
         raise SayError("E0501", 2, fn=f"module {mod.name}", effect=missing, via="its definitions")
+
+
+def can_fail(node: Any, funcs: dict[str, C.Func]) -> bool:
+    for x in C.walk(node):
+        if isinstance(x, (C.Try, C.Within)):
+            return True
+        if isinstance(x, C.Call) and isinstance(x.fn, C.Name) and x.fn.ref.kind == "def":
+            f = funcs.get(x.fn.ref.value)
+            if f is not None and f.fails:
+                return True
+    return False
+
+
+def check_tasks(fn: C.Func, funcs: dict[str, C.Func]) -> None:
+    """Spec 11: E0603 (child captures changeable state), E0605 (`within` limit literal is not a
+    time), E0606 (`several` not declared), E0207 (`timed-out` not declared)."""
+    changeable = {
+        x.target.ref.value: x.target.name
+        for x in C.walk(fn.body)
+        if isinstance(x, C.Bind) and x.mutable and isinstance(x.target, C.PBind) and x.target.ref
+    }
+    for x in C.walk(fn.body):
+        if isinstance(x, C.Within):
+            if isinstance(x.limit, C.Lit) and x.limit.kind != "quantity":
+                raise SayError("E0605", x.line, expr=str(x.limit.value))
+            if "timed-out" not in fn.fails:
+                raise SayError("E0207", x.line, kind="timed-out", fn=fn.name)
+        if not isinstance(x, C.Concurrent):
+            continue
+        for ch in x.children:
+            for y in C.walk(ch.body):
+                if isinstance(y, C.Name) and y.ref.kind == "local" and y.ref.value in changeable:
+                    raise SayError("E0603", x.line, name=y.name)
+        if sum(can_fail(ch.body, funcs) for ch in x.children) >= 2 and "several" not in fn.fails:
+            raise SayError("E0606", x.line)

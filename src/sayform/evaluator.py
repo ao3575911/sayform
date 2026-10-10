@@ -16,6 +16,7 @@ from typing import Any
 
 from . import core as C
 from .diagnostics import SayError, panic
+from .tasks import Failure, Group, Received, Scheduler, receive, seconds
 from .values import (
     UNIT_MS,
     ExprV,
@@ -225,6 +226,9 @@ class Evaluator:
         }
         self.lam_idx: dict[int, tuple[int, ...]] = {}
         self.read: Any = lambda: None
+        self.sched: Scheduler | None = None
+        self.real_time = False
+        self.shuffle: int | None = None
         self.warnings: list[Any] = []
         self.rng = random.Random()
         self.clock: Decimal | None = None
@@ -284,12 +288,67 @@ class Evaluator:
         return (yield from self.ev(b, env))
 
     def run(self, gen: Gen) -> Any:
-        """Drive a generator to completion (the single-task scheduler)."""
+        """Drive a generator to completion on a fresh deterministic scheduler (spec 11 section 8)."""
+        prev, self.sched = self.sched, Scheduler(self.real_time, self.shuffle)
         try:
-            while True:
-                next(gen)
-        except StopIteration as stop:
-            return stop.value
+            return self.sched.loop(gen)
+        finally:
+            self.sched = prev
+
+    # ---- concurrency (spec 11) ----------------------------------------------------------
+    def task_body(self, gen: Gen) -> Gen:
+        try:
+            v = yield from gen
+        except ReturnSig as r:
+            if isinstance(r.value, Problem):
+                return ("fail", r.value)
+            raise
+        return ("fail", v) if isinstance(v, Problem) else ("ok", v)
+
+    def group(self, mode: str, limit: int | None = None) -> Group:
+        assert self.sched is not None and self.sched.current is not None
+        return Group(self.sched, mode, self.sched.current, limit)
+
+    def e_Concurrent(self, n: C.Concurrent, env: Env) -> Gen:
+        yield
+        g = self.group("first" if n.mode == "first" else "all")
+        for ch in n.children:
+            g.add(
+                self.task_body(self.block(ch.body, Env(dict(env.cells), env.caps, env.func, env.free))), ch.label or ""
+            )
+        yield from g.join()
+        out = g.outcome({"all": "all of", "first": "first of"}.get(n.mode, n.mode), n.line)
+        if isinstance(out, Failure):
+            raise ReturnSig(out.problem)
+        if n.mode == "first" or n.mode == "together":
+            return None if n.mode == "together" else out
+        if n.children and n.children[0].label:
+            return Record("record", {c.label or "": v for c, v in zip(n.children, out, strict=True)})
+        return tuple(out)
+
+    def e_Within(self, n: C.Within, env: Env) -> Gen:
+        limit = yield from self.ev(n.limit, env)
+        secs = seconds(limit)
+        if secs is None:
+            raise SayError("E0605", n.line, expr=display(limit, True))
+        yield
+        g = self.group("within")
+        g.add(self.block(n.body, env), "")
+        t, fired = g.tasks[0], []
+        assert self.sched is not None
+        sched = self.sched
+
+        def expire() -> None:
+            fired.append(1)
+            sched.cancel(t)
+
+        sched.timer(secs, lambda: not t.done, expire)
+        yield from g.join()
+        if t.error is not None:
+            raise t.error
+        if fired and t.cancelled:
+            raise ReturnSig(Problem(Sym("timed-out"), f"did not finish within {display(limit)}"))
+        return None
 
     # ---- statements -----------------------------------------------------------------------
     def e_Bind(self, n: C.Bind, env: Env) -> Gen:
@@ -342,8 +401,17 @@ class Evaluator:
 
     def e_For(self, n: C.For, env: Env) -> Gen:
         src = yield from self.ev(n.source, env)
-        if hasattr(src, "drain"):
-            src = yield from src.drain(self)
+        if isinstance(src, Received):
+            assert self.sched is not None
+            while (got := (yield from receive(self.sched, src.ch))) is not None:
+                self.bind(n.binder, got[1], env)
+                try:
+                    yield from self.block(n.body, env)
+                except StopSig:
+                    break
+                except SkipSig:
+                    continue
+            return None
         if not isinstance(src, (tuple, MapV)):
             raise mismatch("for each", src, expected="a list, set or map")
         for x in src:
@@ -533,6 +601,8 @@ class Evaluator:
                     c = env.caps[e.effect]
                     caps[e.effect] = c.narrowed(e.narrowing, node.line) if e.narrowing else c
         new = Env(dict(f.env.cells) if f.env else {}, caps, f if isinstance(node, C.Func) else env.func)
+        if "tasks" in caps and isinstance(node, C.Func) and any(e.effect == "tasks" for e in node.effects):
+            yield  # calling a function that needs tasks is a checkpoint
         pos = iter(args)
         idx = f.idx or self.lambda_indices(f)
         extra = len(args) - len(f.positional)  # builtin lowering passes slot arguments in order
@@ -789,7 +859,14 @@ HOST_EFFECTS = {"console", "files", "clock", "random", "tasks"}
 
 
 def program(
-    mod: C.Module, write: Any = print, read: Any = None, grant: Any = None, backing: Any = None, seed: Any = None
+    mod: C.Module,
+    write: Any = print,
+    read: Any = None,
+    grant: Any = None,
+    backing: Any = None,
+    seed: Any = None,
+    real: bool = False,
+    shuffle: int | None = None,
 ) -> tuple[Evaluator, Any]:
     """Load prelude and `mod`, then call `main` with the capabilities it declares that the
     host grants (spec 07 section 1.5). Returns the evaluator and main's result."""
@@ -800,6 +877,7 @@ def program(
         _PRELUDE.append(prelude_module())
     ev = Evaluator(write)
     ev.read = read or (lambda: None)
+    ev.real_time, ev.shuffle = real, shuffle
     if seed is not None:
         ev.rng.seed(seed)
         ev.clock = Decimal(0)

@@ -95,7 +95,9 @@ def cmd_core(ns: argparse.Namespace) -> int:
     return 0
 
 
-def run_file(path: str, write: Any = None, allow: set[str] | None = None, deny: set[str] | None = None) -> int:
+def run_file(
+    path: str, write: Any = None, allow: set[str] | None = None, deny: set[str] | None = None, shuffle: Any = None
+) -> int:
     """`say run`: exit 0 ok, 1 main returned a problem, 2 compile error, 4 refused, 70 panic."""
     from .diagnostics import EXIT
     from .evaluator import program
@@ -108,7 +110,9 @@ def run_file(path: str, write: Any = None, allow: set[str] | None = None, deny: 
         _, mod, _ = load(path)
         policy = deny or set()
         ev, result = big_stack(
-            lambda: program(mod, write or out, read_line, lambda e: e not in policy and e != "network")
+            lambda: program(
+                mod, write or out, read_line, lambda e: e not in policy and e != "network", real=True, shuffle=shuffle
+            )
         )
         for w in ev.warnings:
             print(w.render(), file=sys.stderr)
@@ -157,7 +161,7 @@ def big_stack(fn: Any) -> Any:
 
 def cmd_run(ns: argparse.Namespace) -> int:
     try:
-        return run_file(ns.file, deny=set(ns.deny or ()))
+        return run_file(ns.file, deny=set(ns.deny or ()), shuffle=ns.shuffle_tasks)
     except Exception as e:  # internal fault: never show a Python traceback (prompt section 9)
         print(f"internal error: {type(e).__name__}: {e}\nThis is a bug in say; please report it.", file=sys.stderr)
         return 70
@@ -185,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("run", help="run a program's main")
     p.add_argument("file")
     p.add_argument("--deny", action="append", help="refuse an effect (host policy)")
+    p.add_argument("--shuffle-tasks", type=int, metavar="SEED", help="perturb the task ready queue deterministically")
     p.add_argument("args", nargs="*", help="program arguments after `--`")
     for name in ("check", "explain", "test", "repl"):
         p = sub.add_parser(name)

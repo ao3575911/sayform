@@ -144,7 +144,8 @@ class Printer:
             return Out(f"approx {float(v)!r}".replace("inf", "inf"), 15)
         if k == "quantity":
             num, unit = v
-            text = f"{num} {UNIT_WORDS[unit]}" if self.w else f"{num}{unit}"
+            word = UNIT_WORDS[unit][:-1] if num == 1 else UNIT_WORDS[unit]
+            text = f"{num} {word}" if self.w else f"{num}{unit}"
             return Out(text, 15) if num >= 0 else Out(text, 11)
         if k == "decimal" and isinstance(v, Decimal):
             return Out(str(v), 15 if v >= 0 else 11)

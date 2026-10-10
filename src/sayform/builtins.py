@@ -419,3 +419,94 @@ def arguments(e: Any) -> tuple[Any, ...]:
     from .symbolic import arguments as args
 
     return tuple(V.ExprV(x) if isinstance(x, (C.Node, C.Ref)) else x for x in args(expr_arg("arguments", e)))
+
+
+# ---- 2.7 tasks (spec 11 section 5) -------------------------------------------------------
+def chan(op: str, c: Any, way: str) -> Any:
+    from .tasks import Channel, End
+
+    if isinstance(c, End) and c.way == way:
+        return c.ch
+    if not isinstance(c, Channel):
+        raise mismatch(op, c, expected=f"a channel or its {way}")
+    return c
+
+
+@host("new-channel", gen=True, needs="tasks")
+def new_channel(ev: Evaluator, env: Env, with_: Any = 0, **kw: Any) -> Gen:
+    from .tasks import Channel
+
+    cap = kw.get("capacity", kw.get("with", with_))
+    if not isinstance(cap, int) or isinstance(cap, bool) or cap < 0:
+        raise mismatch("new-channel", cap, expected="a whole number capacity of at least 0")
+    return Channel(cap)
+    yield
+
+
+@host("send", gen=True, needs="tasks")
+def send(ev: Evaluator, env: Env, value: Any, into: Any) -> Gen:
+    from .tasks import send as snd
+
+    if isinstance(value, V.Record) and value.changeable:
+        raise SayError("E0602", value=display(value, True))
+    assert ev.sched is not None
+    return (yield from snd(ev.sched, chan("send", into, "sender"), value))
+
+
+@host("receive", gen=True, needs="tasks")
+def receive(ev: Evaluator, env: Env, from_: Any) -> Gen:
+    from .tasks import receive as rcv
+
+    assert ev.sched is not None
+    got = yield from rcv(ev.sched, chan("receive", from_, "receiver"))
+    return None if got is None else got[1]
+
+
+@host("close", gen=True, needs="tasks")
+def close(ev: Evaluator, env: Env, ch: Any) -> Gen:
+    from .tasks import close as cls
+
+    assert ev.sched is not None
+    cls(ev.sched, chan("close", ch, "sender"))
+    yield
+
+
+@host("received", gen=True, needs="tasks")
+def received(ev: Evaluator, env: Env, of: Any) -> Gen:
+    from .tasks import Received
+
+    return Received(chan("received", of, "receiver"))
+    yield
+
+
+@host("sleep", gen=True, needs="tasks")
+def sleep(ev: Evaluator, env: Env, for_: Any) -> Gen:
+    from .tasks import live, seconds
+
+    secs = seconds(for_)
+    if secs is None:
+        raise mismatch("sleep", for_, expected="a time quantity")
+    s = ev.sched
+    assert s is not None and s.current is not None
+    me, req = s.current, s.park("sleep")
+    n = me.waitno
+    s.timer(secs, lambda: live(s, me, n), lambda: s.wake(me))
+    yield req
+
+
+@host("map-concurrent", gen=True, needs="tasks")
+def map_concurrent(ev: Evaluator, env: Env, of: Any, f: Any) -> Gen:
+    from .evaluator import ReturnSig
+    from .tasks import Failure
+
+    if not isinstance(of, (tuple, V.SetV)):
+        raise mismatch("map-concurrent", of, expected="a list or set")
+    yield
+    g = ev.group("all", env.caps["tasks"].limit)
+    for x in of:
+        g.add(ev.task_body(ev.apply(f, [x], {}, env)), "")
+    yield from g.join()
+    out = g.outcome("each … at the same time", 0)
+    if isinstance(out, Failure):
+        raise ReturnSig(out.problem)
+    return tuple(out)

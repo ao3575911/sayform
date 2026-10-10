@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- M8: structured concurrency (`tasks.py`): a deterministic single-threaded scheduler (FIFO
+  ready deque, timer min-heap, per-channel FIFO wait queues, virtual clock for tests, real clock
+  for `say run`), `together:`, `all of:` (list or labelled record), `first of:`, `within D:`,
+  `each … at the same time` with `tasks limited to N`, cooperative cancellation at checkpoints,
+  D6 aggregation (one problem unwrapped, two or more → `several` in source order), child panics
+  re-raised with a "while running child" trace line, channels (`new-channel`, `send … into`,
+  `receive from`, `close`, `for each x received from ch`, sender/receiver ends), deadlock
+  detection (SAY-E0612), `--shuffle-tasks SEED`, and static checks SAY-E0603/E0605/E0606 plus
+  `timed-out` for `within` (SAY-E0207). The lexer now reads spaced unit words (`5 seconds`) as
+  time quantities. Tests `CON-01`…`CON-22`.
 - M7: symbolic core (`symbolic.py`): structural matching with repeated pattern variables,
   rulesets as values, the pure `simplify` fallback (bottom-up passes to a fixpoint, cost = node
   count, SCS-1 tie-break, budget → SAY-W0912 and best-so-far), `is equivalent to` (yes / no /
@@ -40,7 +50,9 @@ All notable changes to this project are documented here. The format follows
   `SAYFORM_RT_EXAMPLES` for nightly), RT-MUT, corpus round trips, `LOW` rows,
   `HASH-01`...`HASH-12` (byte vectors in `conformance/hash/vectors.toml`), G-01 prints.
 
-### Spec gaps (decided provisionally, flagged)
+### Spec gaps
+- Display of the anonymous record from a labelled `all of:` is unspecified; we print
+  `record with p 1 and q 2`. (decided provisionally, flagged)
 - `add 1 to n` / `n += 1` on a number adds (12-stdlib defines `added` only for collections).
 - `display` of a Symbol is `'name`; of a function value `function NAME`.
 - `main` returning a problem prints `problem[KIND]` with what/why/try (no registry code exists).
