@@ -1,0 +1,25 @@
+module binary-search
+edition 0
+needs console
+
+
+to find target (a number) xs (a list of numbers) giving an integer:
+    let low be 1, changeable
+    let high be count of xs, changeable
+    while low is at most high:
+        let middle be ((low plus high) divided by 2, rounded down)
+        let value be item middle of xs
+        if value equals target:
+            give back middle
+        otherwise if value is less than target:
+            set low to middle plus 1
+        otherwise:
+            set high to middle minus 1
+    give back 0
+
+
+to main, needs console:
+    let xs be [2, 3, 5, 7, 11, 13, 17]
+    show find(11, xs)
+    show find(2, xs)
+    show find(4, xs)

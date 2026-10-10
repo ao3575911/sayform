@@ -1,0 +1,12 @@
+Module fizzbuzz, edition 0.
+It may use: console.
+Function `main`: takes nothing; gives nothing; may use console.
+L7:   For each `n` in from 1 to 15:
+L8:     If n mod 15 equals 0:
+L9:       Show the text "FizzBuzz".
+L10:     Otherwise, if n mod 3 equals 0:
+L11:       Show the text "Fizz".
+L12:     Otherwise, if n mod 5 equals 0:
+L13:       Show the text "Buzz".
+L14:     Otherwise:
+L15:       Show n.

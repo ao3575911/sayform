@@ -1,0 +1,31 @@
+module derivative
+edition 0
+needs console
+
+
+def derive(of e: Expression) -> Expression:
+    match e:
+        case `(?u + ?v):
+            return `(~derive(u) + ~derive(v))
+        case `(?u * ?v):
+            return `(~derive(u) * ~v + ~u * ~derive(v))
+        else:
+            if head(e) = 'name:
+                return `(1)
+            return `(0)
+
+
+ruleset tidy:
+    ?a * 1 => ?a
+    1 * ?a => ?a
+    ?a * 0 => 0
+    0 * ?a => 0
+    ?a + 0 => ?a
+    0 + ?a => ?a
+
+
+def main() needs console:
+    let p = `(x * x + 3 * x)
+    let d = derive(p)
+    show(d)
+    show(simplify d using tidy)

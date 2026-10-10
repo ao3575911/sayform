@@ -1,0 +1,11 @@
+module word-frequency
+edition 0
+needs console
+
+
+def main() needs console:
+    let words = split("the cat and the hat and the bat", by=" ")
+    let groups = group_by(words, it => it)
+    let counts = map(keys(groups), it => [it, count(groups[it])])
+    for pair in sort_by(counts, it => it[2], descending=yes):
+        show("{pair[1]}: {pair[2]}")

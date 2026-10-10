@@ -1,0 +1,40 @@
+Module prelude-test, edition 0.
+It may use: nothing.
+L5: Check "comparisons":
+L6:   Check that 1 is at most 1.
+L7:   Check that not 2 is at most 1.
+L8:   Check that 2 is greater than 1.
+L9:   Check that 2 is at least 2.
+L10:   Check that 2 is between 1 and 3.
+L11:   Check that not 3 is between 1 and 3, exclusive above.
+L12:   Check that 1 is between 1 and 3, exclusive above.
+L13:   Check that not 1 is between 1 and 3, exclusive.
+L16: Check "numbers":
+L17:   Check that absolute of negative 3 equals 3.
+L18:   Check that absolute of 2.5 equals 2.5.
+L19:   Check that checked-divide 1 by 4 equals 0.25.
+L20:   Check that checked-divide 1 by 0 fails with the symbol division-by-zero.
+L21:   Check that sum of [] equals 0.
+L22:   Check that sum of [1, 2.50] equals 3.5.
+L25: Check "collections":
+L26:   Check that ["a", "b"] joined by ", " equals "a, b".
+L27:   Check that [] joined by ", " equals "".
+L28:   Check that [1, 2] each it times 2 equals [2, 4].
+L29:   Check that {1, 2} each it times 0 equals {0}.
+L30:   Check that [1, 2, 3] whose it is greater than 1 equals [2, 3].
+L31:   Check that [3, 1, 2] sorted equals [1, 2, 3].
+L32:   Check that first of [7, 8] equals 7.
+L33:   Check that first of [] equals nothing.
+L34:   Check that last of [7, 8] equals 8.
+L35:   Check that take 2 from [1, 2, 3] equals [1, 2].
+L36:   Check that take 5 from [1] equals [1].
+L37:   Check that drop 2 from [1, 2, 3] equals [3].
+L38:   Check that ["ab", "b"] grouped by count of it equals {2: ["ab"], 1: ["b"]}.
+L39:   Check that the number of items in zip([1, 2, 3], ["a", "b"]) equals 2.
+L40:   Check that the right of item 1 of zip([1], ["a"]) equals "a".
+L41:   Check that [] is empty.
+L42:   Check that [1] is not empty.
+L43:   Check that reversed of [1, 2, 3] equals [3, 2, 1].
+L44:   Check that largest of [2, 9, 4] equals 9.
+L45:   Check that smallest of [2, 9, 4] equals 2.
+L46:   Check that largest of [] equals nothing.

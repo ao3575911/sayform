@@ -1,0 +1,24 @@
+module average
+edition 0
+needs console
+
+
+note: The mean of a list of numbers.
+    example: average of [1, 2, 3] gives 2
+    example: average of [] fails with empty-list
+def average(of numbers: List[Number]) -> Number fails empty_list:
+    if is_empty(numbers):
+        return problem empty-list
+    return sum(numbers) / count(numbers)
+
+
+def report(of numbers: List[Number]) -> Text fails empty_list:
+    let mean = average(numbers)?
+    return "mean {mean}"
+
+
+def main() needs console:
+    show(average([2, 4, 9]))
+    show(report([1, 2]))
+    let missing = report([])
+    show(missing.kind)

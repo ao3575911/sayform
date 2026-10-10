@@ -1,0 +1,28 @@
+module party
+edition 0
+needs console and tasks
+
+
+note: Two agents spread a party invite. The host writes it once; a messenger passes
+    each guest's copy along a channel, and the greeter welcomes them as they arrive.
+to messenger of guests (a list of text) into ch, needs tasks:
+    for each guest in guests:
+        send "{guest}, you are invited on Saturday at 7" into ch
+    close ch
+
+
+to greeter from ch giving an integer, needs console and tasks:
+    let seen be 0, changeable
+    for each invite received from ch:
+        show invite
+        set seen to seen plus 1
+    give back seen
+
+
+to main, needs console and tasks, may fail with several:
+    let guests be ["Ada", "Grace", "Alan"]
+    let ch be new-channel with capacity 1
+    let sent be all of:
+        messenger of guests into ch
+        greeter from ch
+    show "{item 2 of sent} invites delivered"

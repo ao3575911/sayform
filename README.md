@@ -27,14 +27,53 @@ Work ships milestone by milestone (build plan, section 6). Checked items are mer
 | M8 | Concurrency: `together`, `all of`, `first of`, `within`, channels | done (`CON-01`…`CON-22`) |
 | M9 | Tooling: `say run/check/test/explain`, REPL, diagnostics | done (`TOOL-*`, `EXP-*`, `TEST-*`, `ERR-FORMAT`/`ERR-RETIRED`; per-code `ERR-*` rows partial, see issues) |
 | M10 | Modules and the `strict` dialect | done (`MOD-01`…`MOD-14`, `DIA-01`…`DIA-08`) |
-| M11 | Golden programs G-01 to G-14, README demo, release 0.0.1 | not started |
+| M11 | Golden programs G-01 to G-14, README demo, release 0.0.1 | done (G-01…G-14 byte-exact in `conformance/golden/`; release 0.0.1) |
 
-Until M11 the 60-second demo below is not runnable; the commands that exist today are:
+## 60-second demo
 
 ```sh
 pipx install git+https://github.com/ao3575911/sayform
-say --version
+cd "$(mktemp -d)" && git clone -q https://github.com/ao3575911/sayform && cd sayform
 ```
+
+Hello world, in words and in symbols (same core, same hash):
+
+```sh
+say run conformance/golden/G-01/program.words.say     # Hello, world
+say run conformance/golden/G-01/program.symbols.say   # Hello, world
+say hash conformance/golden/G-01/program.*.say        # two identical b3:… hashes
+```
+
+`say explain` says what the core means, in English:
+
+```text
+$ say explain conformance/golden/G-02/program.say
+Module gst, edition 0.
+It may use: console.
+Function `gst`: takes price (a decimal); gives a decimal; may use nothing.
+L9:   Give back price times 0.10.
+...
+```
+
+Counting starts at 1, and every diagnostic has five parts:
+
+```text
+$ say run first.say          # contains: show xs[0]
+error[SAY-E0181]: literal index 0
+  --> first.say:6:12
+ what: `xs[0]` asks for item 0.
+  why: Sayform counts from 1.
+  try: The first item is `xs[1]` or `first of xs`.
+```
+
+Renaming a local does not change the hash (`let total be n * 2` vs `let doubled be n * 2`
+give the same `b3:…`). And capabilities are real: G-10 may only read inside `./data`:
+
+```sh
+cd conformance/golden/G-10 && say run program.say   # prints 4, then panic SAY-E0502 for ./secret.txt
+```
+
+Two agents spreading a party invite over a channel: `say run examples/party.say`.
 
 ## Budgets
 

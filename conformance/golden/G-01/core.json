@@ -1,0 +1,61 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "hello",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "text",
+          "value": "Hello, world"
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,402 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "algebra-demo",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Ruleset",
+    "name": "algebra",
+    "rules": [
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "add",
+         "ref": {
+          "kind": "builtin",
+          "value": "add"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Name",
+       "name": "a",
+       "ref": {
+        "kind": "patvar",
+        "value": 0
+       }
+      },
+      "guard": null
+     },
+     {
+      "node": "Rule",
+      "lhs": {
+       "node": "PQuote",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "multiply",
+         "ref": {
+          "kind": "builtin",
+          "value": "multiply"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "a",
+          "ref": {
+           "kind": "patvar",
+           "value": 0
+          }
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         }
+        ],
+        "slots": []
+       }
+      },
+      "rhs": {
+       "node": "Lit",
+       "kind": "integer",
+       "value": 0
+      },
+      "guard": null
+     }
+    ]
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "e",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "Quote",
+        "expr": {
+         "node": "Call",
+         "fn": {
+          "node": "Name",
+          "name": "multiply",
+          "ref": {
+           "kind": "builtin",
+           "value": "multiply"
+          }
+         },
+         "args": [
+          {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "x",
+             "ref": {
+              "kind": "free",
+              "value": "x"
+             }
+            },
+            {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "add",
+              "ref": {
+               "kind": "builtin",
+               "value": "add"
+              }
+             },
+             "args": [
+              {
+               "node": "Name",
+               "name": "y",
+               "ref": {
+                "kind": "free",
+                "value": "y"
+               }
+              },
+              {
+               "node": "Lit",
+               "kind": "integer",
+               "value": 0
+              }
+             ],
+             "slots": []
+            }
+           ],
+           "slots": []
+          },
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 1
+          }
+         ],
+         "slots": []
+        }
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "egraph-simplify",
+           "ref": {
+            "kind": "builtin",
+            "value": "egraph-simplify"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "e",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           },
+           {
+            "node": "Name",
+            "name": "algebra",
+            "ref": {
+             "kind": "def",
+             "value": "algebra"
+            }
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "proven",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "egraph-equiv",
+         "ref": {
+          "kind": "builtin",
+          "value": "egraph-equiv"
+         }
+        },
+        "args": [
+         {
+          "node": "Quote",
+          "expr": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "add",
+            "ref": {
+             "kind": "builtin",
+             "value": "add"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "x",
+             "ref": {
+              "kind": "free",
+              "value": "x"
+             }
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 0
+            }
+           ],
+           "slots": []
+          }
+         },
+         {
+          "node": "Quote",
+          "expr": {
+           "node": "Name",
+           "name": "x",
+           "ref": {
+            "kind": "free",
+            "value": "x"
+           }
+          }
+         },
+         {
+          "node": "Name",
+          "name": "algebra",
+          "ref": {
+           "kind": "def",
+           "value": "algebra"
+          }
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Name",
+          "name": "proven",
+          "ref": {
+           "kind": "local",
+           "value": 1
+          }
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

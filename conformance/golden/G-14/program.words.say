@@ -1,0 +1,46 @@
+module prelude-test
+edition 0
+
+
+check "comparisons":
+    check that 1 is at most 1
+    check that not 2 is at most 1
+    check that 2 is greater than 1
+    check that 2 is at least 2
+    check that 2 is between 1 and 3
+    check that not 3 is between 1 and 3, exclusive above
+    check that 1 is between 1 and 3, exclusive above
+    check that not 1 is between 1 and 3, exclusive
+
+
+check "numbers":
+    check that (absolute of negative 3) equals 3
+    check that (absolute of 2.5) equals 2.5
+    check that (checked-divide 1 by 4) equals 0.25
+    check that checked-divide 1 by 0 fails with division-by-zero
+    check that (sum of []) equals 0
+    check that (sum of [1, 2.50]) equals 3.5
+
+
+check "collections":
+    check that ["a", "b"] joined by ", " equals "a, b"
+    check that [] joined by ", " equals ""
+    check that ([1, 2] each it times 2) equals [2, 4]
+    check that ({1, 2} each it times 0) equals {0}
+    check that ([1, 2, 3] where it is greater than 1) equals [2, 3]
+    check that [3, 1, 2] sorted equals [1, 2, 3]
+    check that (first of [7, 8]) equals 7
+    check that (first of []) equals nothing
+    check that (last of [7, 8]) equals 8
+    check that (take 2 from [1, 2, 3]) equals [1, 2]
+    check that (take 5 from [1]) equals [1]
+    check that (drop 2 from [1, 2, 3]) equals [3]
+    check that ["ab", "b"] grouped by count of it equals {2: ["ab"], 1: ["b"]}
+    check that (count of zip([1, 2, 3], ["a", "b"])) equals 2
+    check that (the right of item 1 of zip([1], ["a"])) equals "a"
+    check that [] is empty
+    check that [1] is not empty
+    check that (reversed of [1, 2, 3]) equals [3, 2, 1]
+    check that (largest of [2, 9, 4]) equals 9
+    check that (smallest of [2, 9, 4]) equals 2
+    check that (largest of []) equals nothing

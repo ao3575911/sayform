@@ -1,0 +1,9 @@
+[expect]
+mode = "run"
+exit = 0
+stdout = "stdout.txt"
+words = "program.words.say"
+symbols = "program.symbols.say"
+explain = "explain.txt"
+hash = "b3:3k77xi3iismigcupijpmkecghnqs5na5h52rivpyv6qrgcg22j7a"
+

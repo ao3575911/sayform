@@ -1,0 +1,1791 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "prelude-test",
+  "edition": 0,
+  "uses": [],
+  "needs": [],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Check",
+    "label": "comparisons",
+    "subject": null,
+    "relation": "holds",
+    "expected": null,
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "less-eq",
+         "ref": {
+          "kind": "builtin",
+          "value": "less-eq"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "not",
+         "ref": {
+          "kind": "builtin",
+          "value": "not"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "less-eq",
+           "ref": {
+            "kind": "builtin",
+            "value": "less-eq"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "greater",
+         "ref": {
+          "kind": "builtin",
+          "value": "greater"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "greater-eq",
+         "ref": {
+          "kind": "builtin",
+          "value": "greater-eq"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "between",
+         "ref": {
+          "kind": "builtin",
+          "value": "between"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "not",
+         "ref": {
+          "kind": "builtin",
+          "value": "not"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "between",
+           "ref": {
+            "kind": "builtin",
+            "value": "between"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           }
+          ],
+          "slots": [
+           [
+            "high-inclusive",
+            {
+             "node": "Lit",
+             "kind": "truth",
+             "value": false
+            }
+           ]
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "between",
+         "ref": {
+          "kind": "builtin",
+          "value": "between"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         }
+        ],
+        "slots": [
+         [
+          "high-inclusive",
+          {
+           "node": "Lit",
+           "kind": "truth",
+           "value": false
+          }
+         ]
+        ]
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "not",
+         "ref": {
+          "kind": "builtin",
+          "value": "not"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "between",
+           "ref": {
+            "kind": "builtin",
+            "value": "between"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           }
+          ],
+          "slots": [
+           [
+            "low-inclusive",
+            {
+             "node": "Lit",
+             "kind": "truth",
+             "value": false
+            }
+           ],
+           [
+            "high-inclusive",
+            {
+             "node": "Lit",
+             "kind": "truth",
+             "value": false
+            }
+           ]
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      }
+     ]
+    }
+   },
+   {
+    "node": "Check",
+    "label": "numbers",
+    "subject": null,
+    "relation": "holds",
+    "expected": null,
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "absolute",
+         "ref": {
+          "kind": "builtin",
+          "value": "absolute"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "negate",
+           "ref": {
+            "kind": "builtin",
+            "value": "negate"
+           }
+          },
+          "args": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 3
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "absolute",
+         "ref": {
+          "kind": "builtin",
+          "value": "absolute"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "decimal",
+          "value": "2.5"
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "decimal",
+        "value": "2.5"
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "checked-divide",
+         "ref": {
+          "kind": "builtin",
+          "value": "checked-divide"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": [
+         [
+          "by",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 4
+          }
+         ]
+        ]
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "decimal",
+        "value": "0.25"
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "checked-divide",
+         "ref": {
+          "kind": "builtin",
+          "value": "checked-divide"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ],
+        "slots": [
+         [
+          "by",
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 0
+          }
+         ]
+        ]
+       },
+       "relation": "fails-with",
+       "expected": {
+        "node": "SymLit",
+        "name": "division-by-zero"
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sum",
+         "ref": {
+          "kind": "builtin",
+          "value": "sum"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 0
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sum",
+         "ref": {
+          "kind": "builtin",
+          "value": "sum"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "decimal",
+            "value": "2.50"
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "decimal",
+        "value": "3.5"
+       },
+       "body": null
+      }
+     ]
+    }
+   },
+   {
+    "node": "Check",
+    "label": "collections",
+    "subject": null,
+    "relation": "holds",
+    "expected": null,
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "join-all",
+         "ref": {
+          "kind": "builtin",
+          "value": "join-all"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "a"
+           },
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "b"
+           }
+          ]
+         },
+         {
+          "node": "Lit",
+          "kind": "text",
+          "value": ", "
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "text",
+        "value": "a, b"
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "join-all",
+         "ref": {
+          "kind": "builtin",
+          "value": "join-all"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         },
+         {
+          "node": "Lit",
+          "kind": "text",
+          "value": ", "
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "text",
+        "value": ""
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "map",
+         "ref": {
+          "kind": "builtin",
+          "value": "map"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           }
+          ]
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "it",
+             "ref": {
+              "kind": "local",
+              "value": 0
+             }
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            }
+           ],
+           "slots": []
+          }
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 4
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "map",
+         "ref": {
+          "kind": "builtin",
+          "value": "map"
+         }
+        },
+        "args": [
+         {
+          "node": "SetLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           }
+          ]
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "multiply",
+            "ref": {
+             "kind": "builtin",
+             "value": "multiply"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "it",
+             "ref": {
+              "kind": "local",
+              "value": 1
+             }
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 0
+            }
+           ],
+           "slots": []
+          }
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "SetLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 0
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "filter",
+         "ref": {
+          "kind": "builtin",
+          "value": "filter"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           }
+          ]
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "greater",
+            "ref": {
+             "kind": "builtin",
+             "value": "greater"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "it",
+             "ref": {
+              "kind": "local",
+              "value": 2
+             }
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 1
+            }
+           ],
+           "slots": []
+          }
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sort",
+         "ref": {
+          "kind": "builtin",
+          "value": "sort"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "first",
+         "ref": {
+          "kind": "builtin",
+          "value": "first"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 7
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 8
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 7
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "first",
+         "ref": {
+          "kind": "builtin",
+          "value": "first"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "nothing",
+        "value": null
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "last",
+         "ref": {
+          "kind": "builtin",
+          "value": "last"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 7
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 8
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 8
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "take",
+         "ref": {
+          "kind": "builtin",
+          "value": "take"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         }
+        ],
+        "slots": [
+         [
+          "from",
+          {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 1
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 3
+            }
+           ]
+          }
+         ]
+        ]
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "take",
+         "ref": {
+          "kind": "builtin",
+          "value": "take"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 5
+         }
+        ],
+        "slots": [
+         [
+          "from",
+          {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 1
+            }
+           ]
+          }
+         ]
+        ]
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "drop",
+         "ref": {
+          "kind": "builtin",
+          "value": "drop"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         }
+        ],
+        "slots": [
+         [
+          "from",
+          {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 1
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 2
+            },
+            {
+             "node": "Lit",
+             "kind": "integer",
+             "value": 3
+            }
+           ]
+          }
+         ]
+        ]
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "group-by",
+         "ref": {
+          "kind": "builtin",
+          "value": "group-by"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "ab"
+           },
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "b"
+           }
+          ]
+         },
+         {
+          "node": "Lambda",
+          "params": [
+           {
+            "node": "Param",
+            "name": "it",
+            "slot": null,
+            "type": null,
+            "default": null
+           }
+          ],
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "count",
+            "ref": {
+             "kind": "builtin",
+             "value": "count"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "it",
+             "ref": {
+              "kind": "local",
+              "value": 3
+             }
+            }
+           ],
+           "slots": []
+          }
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "MapLit",
+        "pairs": [
+         [
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 2
+          },
+          {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Lit",
+             "kind": "text",
+             "value": "ab"
+            }
+           ]
+          }
+         ],
+         [
+          {
+           "node": "Lit",
+           "kind": "integer",
+           "value": 1
+          },
+          {
+           "node": "ListLit",
+           "items": [
+            {
+             "node": "Lit",
+             "kind": "text",
+             "value": "b"
+            }
+           ]
+          }
+         ]
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "count",
+         "ref": {
+          "kind": "builtin",
+          "value": "count"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "zip",
+           "ref": {
+            "kind": "builtin",
+            "value": "zip"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 1
+             },
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 2
+             },
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 3
+             }
+            ]
+           },
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "text",
+              "value": "a"
+             },
+             {
+              "node": "Lit",
+              "kind": "text",
+              "value": "b"
+             }
+            ]
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 2
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Get",
+        "target": {
+         "node": "Index",
+         "target": {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "zip",
+           "ref": {
+            "kind": "builtin",
+            "value": "zip"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 1
+             }
+            ]
+           },
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "text",
+              "value": "a"
+             }
+            ]
+           }
+          ],
+          "slots": []
+         },
+         "index": {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         "optional": false
+        },
+        "field": "right",
+        "optional": false
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "text",
+        "value": "a"
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "is-empty",
+         "ref": {
+          "kind": "builtin",
+          "value": "is-empty"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "not",
+         "ref": {
+          "kind": "builtin",
+          "value": "not"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "is-empty",
+           "ref": {
+            "kind": "builtin",
+            "value": "is-empty"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "integer",
+              "value": 1
+             }
+            ]
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "holds",
+       "expected": null,
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "reversed",
+         "ref": {
+          "kind": "builtin",
+          "value": "reversed"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 1
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 3
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "ListLit",
+        "items": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 3
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 2
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         }
+        ]
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "largest",
+         "ref": {
+          "kind": "builtin",
+          "value": "largest"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 9
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 4
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 9
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "smallest",
+         "ref": {
+          "kind": "builtin",
+          "value": "smallest"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 2
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 9
+           },
+           {
+            "node": "Lit",
+            "kind": "integer",
+            "value": 4
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "integer",
+        "value": 2
+       },
+       "body": null
+      },
+      {
+       "node": "Check",
+       "label": null,
+       "subject": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "largest",
+         "ref": {
+          "kind": "builtin",
+          "value": "largest"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": []
+         }
+        ],
+        "slots": []
+       },
+       "relation": "equals",
+       "expected": {
+        "node": "Lit",
+        "kind": "nothing",
+        "value": null
+       },
+       "body": null
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

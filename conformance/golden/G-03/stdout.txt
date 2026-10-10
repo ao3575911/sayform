@@ -1,0 +1,3 @@
+5
+mean 1.5
+'empty-list

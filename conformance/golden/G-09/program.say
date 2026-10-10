@@ -1,0 +1,31 @@
+module derivative
+edition 0
+needs console
+
+
+to derive of e (an expression) giving an expression:
+    match e:
+        when quote (?u + ?v):
+            give back quote (~(derive of u) + ~(derive of v))
+        when quote (?u * ?v):
+            give back quote (~(derive of u) * ~v + ~u * ~(derive of v))
+        otherwise:
+            if head of e equals 'name:
+                give back quote (1)
+            give back quote (0)
+
+
+ruleset tidy:
+    rewrite ?a * 1 as ?a
+    rewrite 1 * ?a as ?a
+    rewrite ?a * 0 as 0
+    rewrite 0 * ?a as 0
+    rewrite ?a + 0 as ?a
+    rewrite 0 + ?a as ?a
+
+
+to main, needs console:
+    let p be quote (x * x + 3 * x)
+    let d be derive of p
+    show d
+    show simplify d using tidy

@@ -248,7 +248,11 @@ def test_exp_07_match_family() -> None:
 
 def test_exp_08_concurrency_family() -> None:
     got = ex_main('together:\n    show "a"\n    show "b"', needs="console and tasks")
-    assert got == ["Run these at the same time and wait for all of them:", '(a) show "a".', '(b) show "b".']
+    assert got == [
+        "Run these at the same time and wait for all of them:",
+        '(a) show the text "a".',
+        '(b) show the text "b".',
+    ]
 
 
 def test_exp_09_symbolic_and_lambda() -> None:

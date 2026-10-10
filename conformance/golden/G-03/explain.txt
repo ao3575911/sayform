@@ -1,0 +1,14 @@
+Module average, edition 0.
+It may use: console.
+Function `average`: takes numbers (a list of numbers); gives a number; may use nothing; may fail with empty-list.
+L10:   If numbers is empty:
+L11:     Give back problem empty-list.
+L12:   Give back sum of numbers divided by the number of items in numbers.
+Function `report`: takes numbers (a list of numbers); gives text; may use nothing; may fail with empty-list.
+L16:   Let `mean` be the result of average given numbers, stopping here and passing on any problem, which never changes.
+L17:   Give back the text "mean {mean}".
+Function `main`: takes nothing; gives nothing; may use console.
+L21:   Show the result of average given [2, 4, 9].
+L22:   Show the result of report given [1, 2].
+L23:   Let `missing` be the result of report given [], which never changes.
+L24:   Show missing's kind.

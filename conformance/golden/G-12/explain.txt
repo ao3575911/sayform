@@ -1,0 +1,13 @@
+Module pipeline, edition 0.
+It may use: console and tasks.
+Function `produce`: takes into ch; gives nothing; may use tasks.
+L7:   For each `n` in from 1 to 4:
+L8:     Send (n times n) into ch.
+L9:   Close ch.
+Function `main`: takes nothing; gives nothing; may use console and tasks.
+L13:   Let `ch` be new-channel with capacity 2, which never changes.
+L14:   Run these at the same time and wait for all of them:
+L15:     (a) the result of produce given into ch.
+L16:     (b) for each `x` in received of ch:
+L17:       Show the text "got {x}".
+L18:   Show the text "done".

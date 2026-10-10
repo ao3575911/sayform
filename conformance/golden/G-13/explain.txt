@@ -1,0 +1,10 @@
+Module vectors, edition 0.
+It may use: console.
+Record `Vector`: has a x (a number) and a y (a number).
+Function `add`: takes u (a Vector), v (a Vector); gives a Vector; may use nothing.
+L10:   Give back Vector with x (u's x plus v's x) and y (u's y plus v's y).
+Function `main`: takes nothing; gives nothing; may use console.
+L14:   Let `v` be Vector with x 1 and y 2, which never changes.
+L15:   Let `w` be Vector with x 3 and y 4, which never changes.
+L16:   Show v plus w.
+L17:   Show 1 plus 2.

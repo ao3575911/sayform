@@ -1,0 +1,8 @@
+Module word-frequency, edition 0.
+It may use: console.
+Function `main`: takes nothing; gives nothing; may use console.
+L7:   Let `words` be split "the cat and the hat and the bat" by " ", which never changes.
+L8:   Let `groups` be words grouped by it, which never changes.
+L9:   Let `counts` be (keys of groups) each [it, count of item it of groups], which never changes.
+L10:   For each `pair` in counts sorted by item 2 of it, descending:
+L11:     Show the text "{item 1 of pair}: {item 2 of pair}".

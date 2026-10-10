@@ -1,0 +1,17 @@
+module vectors
+edition 0
+needs console
+
+
+record Vector(x: Number, y: Number)
+
+
+def add(u: Vector, v: Vector) -> Vector:
+    return Vector(x=u.x + v.x, y=u.y + v.y)
+
+
+def main() needs console:
+    let v = Vector(x=1, y=2)
+    let w = Vector(x=3, y=4)
+    show(v + w)
+    show(1 + 2)

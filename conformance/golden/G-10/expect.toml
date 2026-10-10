@@ -1,0 +1,9 @@
+[expect]
+mode = "run"
+exit = 70
+stdout = "stdout.txt"
+words = "program.words.say"
+symbols = "program.symbols.say"
+explain = "explain.txt"
+hash = "b3:jvinmtr6ue4fkcvkhs67qisfs7u5b3wk4rj3sw4wvip6e4foy6da"
+diagnostics = ["SAY-E0502"]

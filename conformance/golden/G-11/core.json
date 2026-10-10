@@ -1,0 +1,788 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "fan-out",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   },
+   {
+    "node": "EffItem",
+    "effect": "tasks",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "fetch",
+    "params": [
+     {
+      "node": "Param",
+      "name": "name",
+      "slot": null,
+      "type": {
+       "node": "TName",
+       "ref": "text"
+      },
+      "default": null
+     },
+     {
+      "node": "Param",
+      "name": "d",
+      "slot": null,
+      "type": null,
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TName",
+     "ref": "text"
+    },
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "tasks",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "sleep",
+         "ref": {
+          "kind": "builtin",
+          "value": "sleep"
+         }
+        },
+        "args": [],
+        "slots": [
+         [
+          "for",
+          {
+           "node": "Name",
+           "name": "d",
+           "ref": {
+            "kind": "local",
+            "value": 1
+           }
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "node": "If",
+       "branches": [
+        {
+         "node": "Branch",
+         "cond": {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "equal",
+           "ref": {
+            "kind": "builtin",
+            "value": "equal"
+           }
+          },
+          "args": [
+           {
+            "node": "Name",
+            "name": "name",
+            "ref": {
+             "kind": "local",
+             "value": 0
+            }
+           },
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "missing"
+           }
+          ],
+          "slots": []
+         },
+         "body": {
+          "node": "Block",
+          "stmts": [
+           {
+            "node": "Return",
+            "value": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "problem",
+              "ref": {
+               "kind": "builtin",
+               "value": "problem"
+              }
+             },
+             "args": [
+              {
+               "node": "SymLit",
+               "name": "not-found"
+              }
+             ],
+             "slots": []
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "else": null
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "Interp",
+        "parts": [
+         {
+          "node": "Name",
+          "name": "name",
+          "ref": {
+           "kind": "local",
+           "value": 0
+          }
+         },
+         " ok"
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "gather",
+    "params": [
+     {
+      "node": "Param",
+      "name": "names",
+      "slot": "of",
+      "type": {
+       "node": "TApply",
+       "head": "list",
+       "args": [
+        {
+         "node": "TName",
+         "ref": "text"
+        }
+       ]
+      },
+      "default": null
+     }
+    ],
+    "result": {
+     "node": "TApply",
+     "head": "list",
+     "args": [
+      {
+       "node": "TName",
+       "ref": "text"
+      }
+     ]
+    },
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "tasks",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found",
+     "several",
+     "timed-out"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Within",
+       "limit": {
+        "node": "Lit",
+        "kind": "quantity",
+        "value": [
+         "5",
+         "s"
+        ]
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "Return",
+          "value": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "map-concurrent",
+            "ref": {
+             "kind": "builtin",
+             "value": "map-concurrent"
+            }
+           },
+           "args": [
+            {
+             "node": "Name",
+             "name": "names",
+             "ref": {
+              "kind": "local",
+              "value": 0
+             }
+            },
+            {
+             "node": "Lambda",
+             "params": [
+              {
+               "node": "Param",
+               "name": "n",
+               "slot": null,
+               "type": null,
+               "default": null
+              }
+             ],
+             "body": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "fetch",
+               "ref": {
+                "kind": "def",
+                "value": "fetch"
+               }
+              },
+              "args": [
+               {
+                "node": "Name",
+                "name": "n",
+                "ref": {
+                 "kind": "local",
+                 "value": 1
+                }
+               },
+               {
+                "node": "Lit",
+                "kind": "quantity",
+                "value": [
+                 "1",
+                 "s"
+                ]
+               }
+              ],
+              "slots": []
+             }
+            }
+           ],
+           "slots": []
+          }
+         }
+        ]
+       }
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "ListLit",
+        "items": []
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "race",
+    "params": [],
+    "result": {
+     "node": "TApply",
+     "head": "list",
+     "args": [
+      {
+       "node": "TName",
+       "ref": "text"
+      }
+     ]
+    },
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "tasks",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found",
+     "several",
+     "timed-out"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Within",
+       "limit": {
+        "node": "Lit",
+        "kind": "quantity",
+        "value": [
+         "3",
+         "s"
+        ]
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "Return",
+          "value": {
+           "node": "Concurrent",
+           "mode": "all",
+           "children": [
+            {
+             "node": "Child",
+             "label": null,
+             "body": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "fetch",
+               "ref": {
+                "kind": "def",
+                "value": "fetch"
+               }
+              },
+              "args": [
+               {
+                "node": "Lit",
+                "kind": "text",
+                "value": "slow"
+               },
+               {
+                "node": "Lit",
+                "kind": "quantity",
+                "value": [
+                 "1",
+                 "min"
+                ]
+               }
+              ],
+              "slots": []
+             }
+            },
+            {
+             "node": "Child",
+             "label": null,
+             "body": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "fetch",
+               "ref": {
+                "kind": "def",
+                "value": "fetch"
+               }
+              },
+              "args": [
+               {
+                "node": "Lit",
+                "kind": "text",
+                "value": "fast"
+               },
+               {
+                "node": "Lit",
+                "kind": "quantity",
+                "value": [
+                 "1",
+                 "s"
+                ]
+               }
+              ],
+              "slots": []
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "node": "Return",
+       "value": {
+        "node": "ListLit",
+        "items": []
+       }
+      }
+     ]
+    }
+   },
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     },
+     {
+      "node": "EffItem",
+      "effect": "tasks",
+      "narrowing": []
+     }
+    ],
+    "fails": [
+     "not-found",
+     "several",
+     "timed-out"
+    ],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "parts",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "value": {
+        "node": "Concurrent",
+        "mode": "all",
+        "children": [
+         {
+          "node": "Child",
+          "label": "weather",
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "fetch",
+            "ref": {
+             "kind": "def",
+             "value": "fetch"
+            }
+           },
+           "args": [
+            {
+             "node": "Lit",
+             "kind": "text",
+             "value": "weather"
+            },
+            {
+             "node": "Lit",
+             "kind": "quantity",
+             "value": [
+              "2",
+              "s"
+             ]
+            }
+           ],
+           "slots": []
+          }
+         },
+         {
+          "node": "Child",
+          "label": "rates",
+          "body": {
+           "node": "Call",
+           "fn": {
+            "node": "Name",
+            "name": "fetch",
+            "ref": {
+             "kind": "def",
+             "value": "fetch"
+            }
+           },
+           "args": [
+            {
+             "node": "Lit",
+             "kind": "text",
+             "value": "rates"
+            },
+            {
+             "node": "Lit",
+             "kind": "quantity",
+             "value": [
+              "1",
+              "s"
+             ]
+            }
+           ],
+           "slots": []
+          }
+         }
+        ]
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Get",
+          "target": {
+           "node": "Name",
+           "name": "parts",
+           "ref": {
+            "kind": "local",
+            "value": 0
+           }
+          },
+          "field": "weather",
+          "optional": false
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Get",
+          "target": {
+           "node": "Name",
+           "name": "parts",
+           "ref": {
+            "kind": "local",
+            "value": 0
+           }
+          },
+          "field": "rates",
+          "optional": false
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Call",
+          "fn": {
+           "node": "Name",
+           "name": "gather",
+           "ref": {
+            "kind": "def",
+            "value": "gather"
+           }
+          },
+          "args": [
+           {
+            "node": "ListLit",
+            "items": [
+             {
+              "node": "Lit",
+              "kind": "text",
+              "value": "a"
+             },
+             {
+              "node": "Lit",
+              "kind": "text",
+              "value": "b"
+             }
+            ]
+           }
+          ],
+          "slots": []
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "one",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 1
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "gather",
+         "ref": {
+          "kind": "def",
+          "value": "gather"
+         }
+        },
+        "args": [
+         {
+          "node": "ListLit",
+          "items": [
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "a"
+           },
+           {
+            "node": "Lit",
+            "kind": "text",
+            "value": "missing"
+           }
+          ]
+         }
+        ],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Get",
+          "target": {
+           "node": "Name",
+           "name": "one",
+           "ref": {
+            "kind": "local",
+            "value": 1
+           }
+          },
+          "field": "kind",
+          "optional": false
+         }
+        ],
+        "slots": []
+       }
+      },
+      {
+       "node": "Bind",
+       "target": {
+        "node": "PBind",
+        "name": "late",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 2
+        }
+       },
+       "value": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "race",
+         "ref": {
+          "kind": "def",
+          "value": "race"
+         }
+        },
+        "args": [],
+        "slots": []
+       },
+       "mutable": false,
+       "type": null
+      },
+      {
+       "node": "ExprStmt",
+       "expr": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "show",
+         "ref": {
+          "kind": "builtin",
+          "value": "show"
+         }
+        },
+        "args": [
+         {
+          "node": "Get",
+          "target": {
+           "node": "Name",
+           "name": "late",
+           "ref": {
+            "kind": "local",
+            "value": 2
+           }
+          },
+          "field": "kind",
+          "optional": false
+         }
+        ],
+        "slots": []
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

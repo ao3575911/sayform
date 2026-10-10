@@ -1,0 +1,9 @@
+Module line-count, edition 0.
+It may use: console and files.
+Function `count-lines`: takes path (text); gives an integer; may use files; may fail with not-found.
+L7:   Let `text` be files.read-text path, stopping here and passing on any problem, which never changes.
+L8:   Give back the number of items in split text by "\n".
+Function `main`: takes nothing; gives nothing; may use console and files; may fail with not-found.
+L12:   Using only files limited to "./data", read only:
+L13:     Show the result of count-lines given "./data/lines.txt".
+L14:     Show the result of count-lines given "./secret.txt".

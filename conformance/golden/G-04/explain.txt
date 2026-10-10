@@ -1,0 +1,14 @@
+Module shapes, edition 0.
+It may use: console.
+Variant `Shape`: is one of circle, rectangle.
+Function `area`: takes s (a Shape); gives a number; may use nothing.
+L12:   Look at s:
+L13:     When it is circle with radius ?r:
+L14:       Give back 3 times r times r.
+L15:     When it is rectangle with width ?w and height ?h, if w equals h:
+L16:       Give back w times w.
+L17:     When it is rectangle with width ?w and height ?h:
+L18:       Give back w times h.
+Function `main`: takes nothing; gives nothing; may use console.
+L22:   For each `s` in [circle with radius 2, rectangle with width 3 and height 3, rectangle with width 2 and height 5]:
+L23:     Show the result of area given s.

@@ -1,0 +1,16 @@
+module algebra-demo
+edition 0
+needs console
+
+
+ruleset algebra:
+    ?a + 0 => ?a
+    ?a * 1 => ?a
+    ?a * 0 => 0
+
+
+def main() needs console:
+    let e = `(x * (y + 0) * 1)
+    show(simplify e using algebra)
+    let proven = `(x + 0) is equivalent to `(x) using algebra
+    show(proven)

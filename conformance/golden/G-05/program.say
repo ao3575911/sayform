@@ -1,0 +1,11 @@
+module word-frequency
+edition 0
+needs console
+
+
+to main, needs console:
+    let words be split("the cat and the hat and the bat", by=" ")
+    let groups be words grouped by it
+    let counts be keys(groups) each [it, count of (item it of groups)]
+    for each pair in counts sorted by item 2 of it, descending:
+        show "{item 1 of pair}: {item 2 of pair}"

@@ -1,0 +1,343 @@
+{
+ "version": "say-json/1",
+ "core": {
+  "node": "Module",
+  "name": "fizzbuzz",
+  "edition": 0,
+  "uses": [],
+  "needs": [
+   {
+    "node": "EffItem",
+    "effect": "console",
+    "narrowing": []
+   }
+  ],
+  "dialects": [],
+  "body": [
+   {
+    "node": "Func",
+    "name": "main",
+    "params": [],
+    "result": null,
+    "effects": [
+     {
+      "node": "EffItem",
+      "effect": "console",
+      "narrowing": []
+     }
+    ],
+    "fails": [],
+    "generics": [],
+    "body": {
+     "node": "Block",
+     "stmts": [
+      {
+       "node": "For",
+       "binder": {
+        "node": "PBind",
+        "name": "n",
+        "type": null,
+        "ref": {
+         "kind": "local",
+         "value": 0
+        }
+       },
+       "source": {
+        "node": "Call",
+        "fn": {
+         "node": "Name",
+         "name": "range",
+         "ref": {
+          "kind": "builtin",
+          "value": "range"
+         }
+        },
+        "args": [
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 1
+         },
+         {
+          "node": "Lit",
+          "kind": "integer",
+          "value": 15
+         }
+        ],
+        "slots": []
+       },
+       "body": {
+        "node": "Block",
+        "stmts": [
+         {
+          "node": "If",
+          "branches": [
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "equal",
+              "ref": {
+               "kind": "builtin",
+               "value": "equal"
+              }
+             },
+             "args": [
+              {
+               "node": "Call",
+               "fn": {
+                "node": "Name",
+                "name": "modulo",
+                "ref": {
+                 "kind": "builtin",
+                 "value": "modulo"
+                }
+               },
+               "args": [
+                {
+                 "node": "Name",
+                 "name": "n",
+                 "ref": {
+                  "kind": "local",
+                  "value": 0
+                 }
+                },
+                {
+                 "node": "Lit",
+                 "kind": "integer",
+                 "value": 15
+                }
+               ],
+               "slots": []
+              },
+              {
+               "node": "Lit",
+               "kind": "integer",
+               "value": 0
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "ExprStmt",
+               "expr": {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "show",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "show"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Lit",
+                  "kind": "text",
+                  "value": "FizzBuzz"
+                 }
+                ],
+                "slots": []
+               }
+              }
+             ]
+            }
+           },
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "equal",
+              "ref": {
+               "kind": "builtin",
+               "value": "equal"
+              }
+             },
+             "args": [
+              {
+               "node": "Call",
+               "fn": {
+                "node": "Name",
+                "name": "modulo",
+                "ref": {
+                 "kind": "builtin",
+                 "value": "modulo"
+                }
+               },
+               "args": [
+                {
+                 "node": "Name",
+                 "name": "n",
+                 "ref": {
+                  "kind": "local",
+                  "value": 0
+                 }
+                },
+                {
+                 "node": "Lit",
+                 "kind": "integer",
+                 "value": 3
+                }
+               ],
+               "slots": []
+              },
+              {
+               "node": "Lit",
+               "kind": "integer",
+               "value": 0
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "ExprStmt",
+               "expr": {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "show",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "show"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Lit",
+                  "kind": "text",
+                  "value": "Fizz"
+                 }
+                ],
+                "slots": []
+               }
+              }
+             ]
+            }
+           },
+           {
+            "node": "Branch",
+            "cond": {
+             "node": "Call",
+             "fn": {
+              "node": "Name",
+              "name": "equal",
+              "ref": {
+               "kind": "builtin",
+               "value": "equal"
+              }
+             },
+             "args": [
+              {
+               "node": "Call",
+               "fn": {
+                "node": "Name",
+                "name": "modulo",
+                "ref": {
+                 "kind": "builtin",
+                 "value": "modulo"
+                }
+               },
+               "args": [
+                {
+                 "node": "Name",
+                 "name": "n",
+                 "ref": {
+                  "kind": "local",
+                  "value": 0
+                 }
+                },
+                {
+                 "node": "Lit",
+                 "kind": "integer",
+                 "value": 5
+                }
+               ],
+               "slots": []
+              },
+              {
+               "node": "Lit",
+               "kind": "integer",
+               "value": 0
+              }
+             ],
+             "slots": []
+            },
+            "body": {
+             "node": "Block",
+             "stmts": [
+              {
+               "node": "ExprStmt",
+               "expr": {
+                "node": "Call",
+                "fn": {
+                 "node": "Name",
+                 "name": "show",
+                 "ref": {
+                  "kind": "builtin",
+                  "value": "show"
+                 }
+                },
+                "args": [
+                 {
+                  "node": "Lit",
+                  "kind": "text",
+                  "value": "Buzz"
+                 }
+                ],
+                "slots": []
+               }
+              }
+             ]
+            }
+           }
+          ],
+          "else": {
+           "node": "Block",
+           "stmts": [
+            {
+             "node": "ExprStmt",
+             "expr": {
+              "node": "Call",
+              "fn": {
+               "node": "Name",
+               "name": "show",
+               "ref": {
+                "kind": "builtin",
+                "value": "show"
+               }
+              },
+              "args": [
+               {
+                "node": "Name",
+                "name": "n",
+                "ref": {
+                 "kind": "local",
+                 "value": 0
+                }
+               }
+              ],
+              "slots": []
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}
