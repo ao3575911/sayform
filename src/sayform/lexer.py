@@ -164,9 +164,7 @@ class Lexer:
                 if self.depth > 0:
                     self.i += 1
                     continue
-                raise self.err(
-                    "E0130", token="tab", expected="a space between tokens", hint="use spaces"
-                )
+                raise self.err("E0130", token="tab", expected="a space between tokens", hint="use spaces")
             if c == "#":
                 self.comment()
                 continue
@@ -350,21 +348,12 @@ class Lexer:
             self.add("NAME" if v == "in" else "OP", v, i, spaced, raw=c)
             return
         if s.startswith("**", i):
-            raise self.err(
-                "E0105", text="**", reason="`**` is not an operator", fix="use `^` for powers"
-            )
+            raise self.err("E0105", text="**", reason="`**` is not an operator", fix="use `^` for powers")
         if (
             c == "."
             and i + 1 < len(s)
             and s[i + 1].isdigit()
-            and (
-                spaced
-                or (
-                    self.toks
-                    and self.toks[-1].kind == "OP"
-                    and not self.toks[-1].is_op(")", "]", "}")
-                )
-            )
+            and (spaced or (self.toks and self.toks[-1].kind == "OP" and not self.toks[-1].is_op(")", "]", "}")))
         ):
             k = i + 1
             while k < len(s) and s[k].isdigit():
@@ -488,11 +477,7 @@ class Lexer:
             if rest.split("#")[0].strip():
                 raise self.err("E0135", text=intpart + ".", suggested=intpart)
         exp = ""
-        if (
-            j < len(s)
-            and s[j] in "eE"
-            and (approx or (j + 1 < len(s) and (s[j + 1].isdigit() or s[j + 1] in "+-")))
-        ):
+        if j < len(s) and s[j] in "eE" and (approx or (j + 1 < len(s) and (s[j + 1].isdigit() or s[j + 1] in "+-"))):
             k = j + 1
             if k < len(s) and s[k] in "+-":
                 k += 1
@@ -526,9 +511,7 @@ class Lexer:
             suffix = s[j:k]
             if suffix in ("ms", "s", "min"):
                 self.i = k
-                self.add(
-                    "DUR", (self.numval(intpart, frac), TIME_UNITS[suffix]), st, spaced, raw=s[st:k]
-                )
+                self.add("DUR", (self.numval(intpart, frac), TIME_UNITS[suffix]), st, spaced, raw=s[st:k])
                 return
             raise self.err("E0135", text=s[st:k], suggested=text)
         self.add("DEC" if frac else "INT", self.numval(intpart, frac), st, spaced, raw=text)

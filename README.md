@@ -18,7 +18,7 @@ Work ships milestone by milestone (build plan, section 6). Checked items are mer
 |---|---|---|
 | M0 | Scaffold, licence, spec import, CI, `say --version`, budget and spec-sync checks | done |
 | M1 | Lexer | done (lexer-level `LEX-*`; fmt and parser parts follow in M2/M3) |
-| M2 | Parser for both surfaces, disambiguation R1–R20 | not started |
+| M2 | Parser for both surfaces, disambiguation R1–R20 | done (`GRM-01`…`GRM-30`; see [ADR 0001](docs/adr/0001-hand-written-parser.md)) |
 | M3 | Core AST, lowering, printers, `say fmt`, `say core`, SCS-1, `say hash` | not started |
 | M4 | Values and evaluator | not started |
 | M5 | Effects, capability context, host policy | not started |

@@ -18,9 +18,7 @@ def test_version(capsys: object) -> None:
 
 
 def run_tool(name: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [sys.executable, str(ROOT / "tools" / name)], capture_output=True, text=True, check=False
-    )
+    return subprocess.run([sys.executable, str(ROOT / "tools" / name)], capture_output=True, text=True, check=False)
 
 
 def test_budgets_hold() -> None:
